@@ -1,4 +1,9 @@
 /PRMS/dist/
 PRMS_Android/app
-/PRMS/nbproject/private/
-/nocturne/nbproject/private/
+PRMS/nbproject/private/
+nocturne/nbproject/private/
+PRMS/build/
+PRMS/nbbuild/
+PRMS/dist/
+PRMS/nbdist/
+PRMS/.nb-gradle/
