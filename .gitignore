@@ -1,3 +1,4 @@
 /PRMS/dist/
 PRMS_Android/app
-**/nbproject/private
+/PRMS/nbproject/private/
+/nocturne/nbproject/private/
