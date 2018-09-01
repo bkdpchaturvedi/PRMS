@@ -15,31 +15,33 @@ import sg.edu.nus.iss.phoenix.core.dao.DBConstants;
  * @author MyatMin
  */
 public abstract class DBConnector {
+
     private Connection connection;
+
     protected void openConnection() {
-		try {
-			Class.forName(DBConstants.COM_MYSQL_JDBC_DRIVER);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            Class.forName(DBConstants.COM_MYSQL_JDBC_DRIVER);
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-		try {
-			this.connection = DriverManager.getConnection(DBConstants.dbUrl,
-					DBConstants.dbUserName, DBConstants.dbPassword);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+        try {
+            this.connection = DriverManager.getConnection(DBConstants.dbUrl,
+                    DBConstants.dbUserName, DBConstants.dbPassword);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-	private void closeConnection() {
-		try {
-			this.connection.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    }
+
+    protected void closeConnection() {
+        try {
+            this.connection.close();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }
