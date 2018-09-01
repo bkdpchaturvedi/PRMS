@@ -6,7 +6,7 @@
 package sg.edu.nus.iss.phoenix.schedule.entity;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import sg.edu.nus.iss.phoenix.authenticate.entity.User;
 import sg.edu.nus.iss.phoenix.radioprogram.entity.RadioProgram;
 
@@ -22,7 +22,7 @@ public class ProgramSlot implements Serializable, Cloneable {
      * Persistent Instance variables. This data is directly 
      * mapped to the columns of database table.
      */
-    private Timestamp dateOfProgram;
+    private LocalDateTime dateOfProgram;
     private Integer duration;
     private RadioProgram radioProgram;
     private User presenter;
@@ -37,7 +37,7 @@ public class ProgramSlot implements Serializable, Cloneable {
     public ProgramSlot() {
     }
 
-    public ProgramSlot(Timestamp dateOfProgram, Integer duration, RadioProgram radioProgram, User presenter, User producer) {
+    public ProgramSlot(LocalDateTime dateOfProgram, Integer duration, RadioProgram radioProgram, User presenter, User producer) {
         this.dateOfProgram = dateOfProgram;
         this.duration = duration;
         this.radioProgram = radioProgram;
@@ -53,11 +53,11 @@ public class ProgramSlot implements Serializable, Cloneable {
      * so these might require some manual additions.
      * @return 
      */   
-    public Timestamp getDateOfProgram() {
+    public LocalDateTime getDateOfProgram() {
         return dateOfProgram;
     }
 
-    public void setDateOfProgram(Timestamp dateOfProgram) {
+    public void setDateOfProgram(LocalDateTime dateOfProgram) {
         this.dateOfProgram = dateOfProgram;
     }
 

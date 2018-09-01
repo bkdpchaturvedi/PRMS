@@ -15,6 +15,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.enterprise.context.RequestScoped;
+import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
@@ -45,7 +46,7 @@ public class ScheduleRESTService {
     /**
      * Retrieves representation of an instance of resource
      * @param dateOfProgram
-     * @return an instance of program slot
+     * @return an instance of JSONEnvelop of program slot
      */
     @GET
     @Path("/{dateofProgram}")
@@ -54,6 +55,11 @@ public class ScheduleRESTService {
         //TODO return proper representation object
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * Retrieves representation of an instance of resource
+     * @return an instance of JSONEnvelop of program slot array list
+     */
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
@@ -62,16 +68,17 @@ public class ScheduleRESTService {
         JSONEnvelop<ArrayList<ProgramSlot>> result;
         result = new JSONEnvelop<>();
         result.setData(new ArrayList<> ());
-        return result;        
+        return result;
     }
 
     /**
-     * PUT method for updating or creating an instance of ScheduleRESTService
-     * @param content representation for the resource
+     * POST method for creating an instance of resource
+     * @param input representation for the resource
+     * @param username representation for the actor's username
      */
-    @PUT
+    @POST
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void putJson(String content) {
+    public void creaeProgramSlot(ProgramSlot input, String username) {
     }
 }
