@@ -20,10 +20,9 @@ public class ScheduleService {
     /**
      *
      * @param input
-     * @param username
      * @throws SQLException
      */
-    public void createProgramSlot(ProgramSlot input, String username) throws SQLException {
+    public void createProgramSlot(ProgramSlot input) throws SQLException {
         //TODO return proper representation object
         throw new UnsupportedOperationException();
     }
@@ -40,10 +39,10 @@ public class ScheduleService {
 
     /**
      *
-     * @param filter
+     * @param dateOfProgram
      * @throws SQLException
      */
-    public void findProgramSlots(LocalDate filter) throws SQLException {
+    public void findProgramSlots(LocalDateTime dateOfProgram) throws SQLException {
         //TODO return proper representation object
         throw new UnsupportedOperationException();
     }
@@ -69,10 +68,9 @@ public class ScheduleService {
     /**
      *
      * @param input
-     * @param username
      * @throws SQLException
      */
-    private void populateSchedule(ProgramSlot input, String username) throws SQLException {
+    private void populateSchedule(ProgramSlot input) throws SQLException {
         //TODO return proper representation object
         throw new UnsupportedOperationException();
     }

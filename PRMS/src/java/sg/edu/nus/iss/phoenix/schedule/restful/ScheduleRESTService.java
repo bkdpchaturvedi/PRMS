@@ -80,7 +80,6 @@ public class ScheduleRESTService {
      * POST method for creating an instance of resource
      *
      * @param input representation for the resource
-     * @param username representation for the actor's username
      */
     @POST
     @Path("/create")
@@ -119,12 +118,12 @@ public class ScheduleRESTService {
     /**
      * Retrieves representation of filtered instances of resource
      *
-     * @param filter date for the filtering the resource
+     * @param dateOfProgram date for the filtering the resource
      * @return
      */
     @GET
     @Path("/")
-    public JSONEnvelop<List<ProgramSlot>> findProgramSlots(@QueryParam("date") String filter) {
+    public JSONEnvelop<List<ProgramSlot>> findProgramSlots(@QueryParam("dateOfProgram") String dateOfProgram) {
         //TODO return proper representation object
         throw new UnsupportedOperationException();
     }
