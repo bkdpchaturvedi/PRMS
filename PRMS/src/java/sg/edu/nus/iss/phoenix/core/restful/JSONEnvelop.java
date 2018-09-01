@@ -3,13 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package sg.edu.nus.iss.phones.core.restful;
+package sg.edu.nus.iss.phoenix.core.restful;
+
+import java.io.Serializable;
 
 /**
  *
  * @author MyatMin
  */
-public class JSONEnvelop<T extends Object> {
+public class JSONEnvelop<T extends Object> implements Serializable {
+
     private T data;
     private Error error;
 
@@ -30,11 +33,11 @@ public class JSONEnvelop<T extends Object> {
     }
 
     public JSONEnvelop() {
-    }    
-    
+    }
+
     public JSONEnvelop(T data, Error error) {
         this.data = data;
         this.error = error;
-    } 
-    
+    }
+
 }
