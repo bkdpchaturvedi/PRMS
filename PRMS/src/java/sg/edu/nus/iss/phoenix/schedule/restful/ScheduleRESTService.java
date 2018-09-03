@@ -5,6 +5,8 @@
  */
 package sg.edu.nus.iss.phoenix.schedule.restful;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Context;
@@ -67,13 +69,14 @@ public class ScheduleRESTService {
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public JSONEnvelop<ArrayList<ProgramSlot>> getAllProgramSlots() {
+    public JSONEnvelop<List<ProgramSlot>> getAllProgramSlots() {
 
-        JSONEnvelop<ArrayList<ProgramSlot>> result;
+        JSONEnvelop<List<ProgramSlot>> result;
         result = new JSONEnvelop<>();
-        result.setData(new ArrayList<>());
+        result.setData(service.getAllProgramSlots());
         //TODO return proper representation object
-        throw new UnsupportedOperationException();
+        return result;
+       // throw new UnsupportedOperationException();
     }
 
     /**
@@ -124,7 +127,10 @@ public class ScheduleRESTService {
     @GET
     @Path("/")
     public JSONEnvelop<List<ProgramSlot>> findProgramSlots(@QueryParam("dateOfProgram") String dateOfProgram) {
+         JSONEnvelop<List<ProgramSlot>> result;
+        result = new JSONEnvelop<>();
+        result.setData(service.findProgramSlots(LocalDateTime.parse(dateOfProgram)));
         //TODO return proper representation object
-        throw new UnsupportedOperationException();
+        return result;
     }
 }

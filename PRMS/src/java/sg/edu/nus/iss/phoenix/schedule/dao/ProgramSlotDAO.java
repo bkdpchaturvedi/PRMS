@@ -114,7 +114,7 @@ public interface ProgramSlotDAO {
      * @throws java.sql.SQLException
      */
     public abstract List<ProgramSlot> loadAll()
-            throws SQLException;
+            throws SQLException, NotFoundException;
 
     /**
      * search-Method. This method provides searching capability to get matching

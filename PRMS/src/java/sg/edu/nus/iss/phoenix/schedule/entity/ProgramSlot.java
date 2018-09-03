@@ -6,10 +6,10 @@
 package sg.edu.nus.iss.phoenix.schedule.entity;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.sql.Date;
 import sg.edu.nus.iss.phoenix.authenticate.entity.User;
 import sg.edu.nus.iss.phoenix.radioprogram.entity.RadioProgram;
-
+import java.sql.Time;
 /**
  * AnnualSchedule Value Object. This class is value object representing database
  * table program-slot. This class is intented to be used together with
@@ -23,12 +23,15 @@ public class ProgramSlot implements Serializable, Cloneable {
      * Persistent Instance variables. This data is directly mapped to the
      * columns of database table.
      */
-    private LocalDateTime dateOfProgram;
-    private Integer duration;
+    private Date dateOfProgram;
+    private Time duration;
     private RadioProgram radioProgram;
     private User presenter;
     private User producer;
     private String assignedBy;
+    private Date startTime;
+
+  
 
     /**
      * Constructors. The first one takes no arguments and provides the most
@@ -38,12 +41,13 @@ public class ProgramSlot implements Serializable, Cloneable {
     public ProgramSlot() {
     }
 
-    public ProgramSlot(LocalDateTime dateOfProgram, Integer duration, RadioProgram radioProgram, User presenter, User producer) {
+    public ProgramSlot(Date dateOfProgram, Time duration, RadioProgram radioProgram, User presenter, User producer,Date startTime) {
         this.dateOfProgram = dateOfProgram;
         this.duration = duration;
         this.radioProgram = radioProgram;
         this.presenter = presenter;
         this.producer = producer;
+        this.startTime=startTime;
     }
 
     /**
@@ -53,19 +57,19 @@ public class ProgramSlot implements Serializable, Cloneable {
      *
      * @return
      */
-    public LocalDateTime getDateOfProgram() {
+    public Date getDateOfProgram() {
         return dateOfProgram;
     }
 
-    public void setDateOfProgram(LocalDateTime dateOfProgram) {
+    public void setDateOfProgram(Date dateOfProgram) {
         this.dateOfProgram = dateOfProgram;
     }
 
-    public Integer getDuration() {
+    public Time getDuration() {
         return duration;
     }
 
-    public void setDuration(Integer duration) {
+    public void setDuration(Time duration) {
         this.duration = duration;
     }
 
@@ -100,7 +104,13 @@ public class ProgramSlot implements Serializable, Cloneable {
     public void setAssignedBy(String assignedBy) {
         this.assignedBy = assignedBy;
     }
-
+  public Date getStartTime() {
+        return startTime;
+    }
+   
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
     /**
      * hasEqualMapping-method will compare two RadioProgram instances and return
      * true if they contain same values in all persistent instance variables. If

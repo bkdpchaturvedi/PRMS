@@ -16,7 +16,7 @@ import sg.edu.nus.iss.phoenix.core.dao.DBConstants;
  */
 public abstract class DBConnector {
 
-    private Connection connection;
+    protected Connection connection;
 
     protected void openConnection() {
         try {
