@@ -25,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 import sg.edu.nus.iss.phoenix.schedule.service.ScheduleService;
 import sg.edu.nus.iss.phoenix.core.restful.JSONEnvelop;
-
+import sg.edu.nus.iss.phoenix.core.restful.Error;
 /**
  * REST Web Service
  *
@@ -70,10 +70,20 @@ public class ScheduleRESTService {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public JSONEnvelop<List<ProgramSlot>> getAllProgramSlots() {
-
+        
         JSONEnvelop<List<ProgramSlot>> result;
         result = new JSONEnvelop<>();
+        
+        try
+        {
         result.setData(service.getAllProgramSlots());
+        }
+        catch(Exception ex)
+        {
+           
+            result.setError(new Error("Error while Retrieving program slots ",ex.getMessage()));
+        }
+        
         //TODO return proper representation object
         return result;
        // throw new UnsupportedOperationException();
@@ -125,11 +135,23 @@ public class ScheduleRESTService {
      * @return
      */
     @GET
-    @Path("/")
+    @Path("/allbydate")
     public JSONEnvelop<List<ProgramSlot>> findProgramSlots(@QueryParam("dateOfProgram") String dateOfProgram) {
-         JSONEnvelop<List<ProgramSlot>> result;
+        
+        
+        JSONEnvelop<List<ProgramSlot>> result;
         result = new JSONEnvelop<>();
-        result.setData(service.findProgramSlots(LocalDateTime.parse(dateOfProgram)));
+        LocalDateTime inputDateTime;
+        try
+        {
+            inputDateTime= LocalDateTime.parse(dateOfProgram);
+            result.setData(service.findProgramSlots(inputDateTime));
+        }
+        catch(Exception ex)
+        {
+            result.setError(new Error("Error While retrieving the records by date",ex.getMessage()));
+        }
+        
         //TODO return proper representation object
         return result;
     }
