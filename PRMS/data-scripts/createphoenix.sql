@@ -113,10 +113,12 @@ CREATE INDEX `id_annual_schedule` ON `phoenix`.`annual-schedule` (`assingedBy` A
 DROP TABLE IF EXISTS `phoenix`.`program-slot` ;
 
 CREATE  TABLE IF NOT EXISTS `phoenix`.`program-slot` (
-  `duration` TIME NOT NULL ,
   `dateOfProgram` DATETIME NOT NULL ,
-  `startTime` DATETIME NULL ,
+  `duration` TIME NOT NULL ,
   `program-name` VARCHAR(45) NULL ,
+  `presenter` VARCHAR(40)  NOT NULL,
+  `producer` VARCHAR(40)  NOT NULL,
+  `assingedBy` VARCHAR(45) NULL ,
   PRIMARY KEY (`duration`, `dateOfProgram`) ,
   CONSTRAINT `name`
     FOREIGN KEY (`program-name` )
@@ -126,6 +128,10 @@ CREATE  TABLE IF NOT EXISTS `phoenix`.`program-slot` (
 ENGINE = InnoDB;
 
 CREATE INDEX `name_program_slot` ON `phoenix`.`program-slot` (`program-name` ASC) ;
+
+CREATE INDEX `presenter_program_slot` ON `phoenix`.`user` (`id` ASC) ;
+
+CREATE INDEX `producer_program_slot` ON `phoenix`.`user` (`id` ASC) ;
 
 CREATE UNIQUE INDEX `dateOfProgram_UNIQUE` ON `phoenix`.`program-slot` (`dateOfProgram` ASC) ;
 

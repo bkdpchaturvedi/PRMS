@@ -7,6 +7,10 @@ package sg.edu.nus.iss.phoenix.schedule.restful;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Context;
@@ -97,7 +101,7 @@ public class ScheduleRESTService {
      *
      * @param content representation for the resource
      */
-    @POST
+    @PUT
     @Path("/update")
     @Consumes(MediaType.APPLICATION_JSON)
     public JSONEnvelop<Boolean> updateRadioProgram(ProgramSlot input) {
@@ -125,9 +129,9 @@ public class ScheduleRESTService {
      * @return
      */
     @GET
-    @Path("/")
     public JSONEnvelop<List<ProgramSlot>> findProgramSlots(@QueryParam("dateOfProgram") String dateOfProgram) {
-         JSONEnvelop<List<ProgramSlot>> result;
+        JSONEnvelop<List<ProgramSlot>> result;
+        ZonedDateTime.parse(dateOfProgram, DateTimeFormatter.ISO_DATE_TIME).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
         result = new JSONEnvelop<>();
         result.setData(service.findProgramSlots(LocalDateTime.parse(dateOfProgram)));
         //TODO return proper representation object
