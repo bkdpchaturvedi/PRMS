@@ -9,7 +9,8 @@ import java.io.Serializable;
 import java.sql.Date;
 import sg.edu.nus.iss.phoenix.authenticate.entity.User;
 import sg.edu.nus.iss.phoenix.radioprogram.entity.RadioProgram;
-import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 /**
  * AnnualSchedule Value Object. This class is value object representing database
  * table program-slot. This class is intented to be used together with
@@ -24,12 +25,12 @@ public class ProgramSlot implements Serializable, Cloneable {
      * columns of database table.
      */
     private Date dateOfProgram;
-    private Time duration;
+    private LocalTime duration;
     private RadioProgram radioProgram;
     private User presenter;
     private User producer;
     private String assignedBy;
-    private Date startTime;
+    private LocalDateTime startTime;
 
   
 
@@ -41,7 +42,7 @@ public class ProgramSlot implements Serializable, Cloneable {
     public ProgramSlot() {
     }
 
-    public ProgramSlot(Date dateOfProgram, Time duration, RadioProgram radioProgram, User presenter, User producer,Date startTime) {
+    public ProgramSlot(Date dateOfProgram, LocalTime duration, RadioProgram radioProgram, User presenter, User producer,LocalDateTime startTime) {
         this.dateOfProgram = dateOfProgram;
         this.duration = duration;
         this.radioProgram = radioProgram;
@@ -65,11 +66,11 @@ public class ProgramSlot implements Serializable, Cloneable {
         this.dateOfProgram = dateOfProgram;
     }
 
-    public Time getDuration() {
+    public LocalTime getDuration() {
         return duration;
     }
 
-    public void setDuration(Time duration) {
+    public void setDuration(LocalTime duration) {
         this.duration = duration;
     }
 
@@ -104,11 +105,11 @@ public class ProgramSlot implements Serializable, Cloneable {
     public void setAssignedBy(String assignedBy) {
         this.assignedBy = assignedBy;
     }
-  public Date getStartTime() {
+  public LocalDateTime getStartTime() {
         return startTime;
     }
    
-    public void setStartTime(Date startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
     /**

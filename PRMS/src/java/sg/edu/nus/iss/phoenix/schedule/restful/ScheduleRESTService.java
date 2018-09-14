@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 import sg.edu.nus.iss.phoenix.schedule.service.ScheduleService;
 import sg.edu.nus.iss.phoenix.core.restful.JSONEnvelop;
+import sg.edu.nus.iss.phoenix.core.restful.Error;
 
 /**
  * REST Web Service
@@ -60,7 +61,9 @@ public class ScheduleRESTService {
     @GET
     @Path("/{dateOfProgram}")
     @Produces(MediaType.APPLICATION_JSON)
-    public JSONEnvelop<ProgramSlot> getProgramSlot(@PathParam("dateOfProgram") String dateOfProgram) {
+    public JSONEnvelop<ProgramSlot> getProgramSlot(
+            @PathParam("dateOfProgram") String dateOfProgram
+    ) {
         //TODO return proper representation object
         throw new UnsupportedOperationException();
     }
@@ -77,10 +80,17 @@ public class ScheduleRESTService {
 
         JSONEnvelop<List<ProgramSlot>> result;
         result = new JSONEnvelop<>();
-        result.setData(service.getAllProgramSlots());
+
+        try {
+            result.setData(service.getAllProgramSlots());
+        } catch (Exception ex) {
+
+            result.setError(new Error("Error while Retrieving program slots ", ex.getMessage()));
+        }
+
         //TODO return proper representation object
         return result;
-       // throw new UnsupportedOperationException();
+        // throw new UnsupportedOperationException();
     }
 
     /**
@@ -117,7 +127,9 @@ public class ScheduleRESTService {
     @DELETE
     @Path("/delete/{dateOfProgram}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public JSONEnvelop<Boolean> deleteRadioProgram(@PathParam("dateOfProgram") String dateOfProgram) {
+    public JSONEnvelop<Boolean> deleteRadioProgram(
+            @PathParam("dateOfProgram") String dateOfProgram
+    ) {
         //TODO return proper representation object
         throw new UnsupportedOperationException();
     }
@@ -129,11 +141,27 @@ public class ScheduleRESTService {
      * @return
      */
     @GET
-    public JSONEnvelop<List<ProgramSlot>> findProgramSlots(@QueryParam("dateOfProgram") String dateOfProgram) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public JSONEnvelop<List<ProgramSlot>> findProgramSlots(
+            @QueryParam("dateOfProgram") String dateOfProgram
+    ) {
         JSONEnvelop<List<ProgramSlot>> result;
-        ZonedDateTime.parse(dateOfProgram, DateTimeFormatter.ISO_DATE_TIME).truncatedTo(ChronoUnit.DAYS).withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
         result = new JSONEnvelop<>();
-        result.setData(service.findProgramSlots(LocalDateTime.parse(dateOfProgram)));
+        LocalDateTime inputDateTime;
+        try {
+            inputDateTime = ZonedDateTime
+                    .parse(dateOfProgram, DateTimeFormatter.ISO_DATE_TIME)
+                    .truncatedTo(ChronoUnit.DAYS)
+                    .withZoneSameInstant(ZoneOffset.UTC)
+                    .toLocalDateTime();
+            result.setData(service.findProgramSlots(inputDateTime));
+        } catch (Exception ex) {
+            result.setError(
+                    new Error("Error While retrieving the records by date",
+                            ex.getMessage())
+            );
+        }
+
         //TODO return proper representation object
         return result;
     }
