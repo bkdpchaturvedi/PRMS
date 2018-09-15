@@ -11,6 +11,7 @@ import sg.edu.nus.iss.phoenix.authenticate.entity.User;
 import sg.edu.nus.iss.phoenix.radioprogram.entity.RadioProgram;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+
 /**
  * AnnualSchedule Value Object. This class is value object representing database
  * table program-slot. This class is intented to be used together with
@@ -32,8 +33,6 @@ public class ProgramSlot implements Serializable, Cloneable {
     private String assignedBy;
     private LocalDateTime startTime;
 
-  
-
     /**
      * Constructors. The first one takes no arguments and provides the most
      * simple way to create object instance. The another one takes one argument,
@@ -42,13 +41,13 @@ public class ProgramSlot implements Serializable, Cloneable {
     public ProgramSlot() {
     }
 
-    public ProgramSlot(Date dateOfProgram, LocalTime duration, RadioProgram radioProgram, User presenter, User producer,LocalDateTime startTime) {
+    public ProgramSlot(Date dateOfProgram, LocalTime duration, RadioProgram radioProgram, User presenter, User producer, LocalDateTime startTime) {
         this.dateOfProgram = dateOfProgram;
         this.duration = duration;
         this.radioProgram = radioProgram;
         this.presenter = presenter;
         this.producer = producer;
-        this.startTime=startTime;
+        this.startTime = startTime;
     }
 
     /**
@@ -105,13 +104,15 @@ public class ProgramSlot implements Serializable, Cloneable {
     public void setAssignedBy(String assignedBy) {
         this.assignedBy = assignedBy;
     }
-  public LocalDateTime getStartTime() {
+
+    public LocalDateTime getStartTime() {
         return startTime;
     }
-   
+
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
+
     /**
      * hasEqualMapping-method will compare two RadioProgram instances and return
      * true if they contain same values in all persistent instance variables. If

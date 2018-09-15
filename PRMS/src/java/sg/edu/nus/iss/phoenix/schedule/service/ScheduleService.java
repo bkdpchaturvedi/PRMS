@@ -21,6 +21,8 @@ import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 public class ScheduleService {
 
     /**
+     * Creates representation of an instance of resource to persistent data
+     * table
      *
      * @param input
      * @throws SQLException
@@ -31,6 +33,8 @@ public class ScheduleService {
     }
 
     /**
+     * Deletes representation of an instance of resource to persistent data
+     * table
      *
      * @param input
      * @throws SQLException
@@ -41,20 +45,22 @@ public class ScheduleService {
     }
 
     /**
+     * Retrieves representation of an instance of resource from persistent data
+     * table
      *
      * @param dateOfProgram
      * @throws SQLException
      */
-    public List<ProgramSlot> findProgramSlots(LocalDateTime dateOfProgram)  {
+    public List<ProgramSlot> findProgramSlots(LocalDateTime dateOfProgram) {
         //TODO return proper representation object
-       ArrayList<ProgramSlot> currentList = new ArrayList<ProgramSlot>();
+        ArrayList<ProgramSlot> currentList = new ArrayList<ProgramSlot>();
         try {
-        ProgramSlot srchProgramSlot=DAOFactory.getProgramSlotDAO().createValueObject();
-        srchProgramSlot.setDateOfProgram(Date.valueOf(dateOfProgram.toLocalDate()));
-        ;
+            ProgramSlot srchProgramSlot = DAOFactory.getProgramSlotDAO().createValueObject();
+            srchProgramSlot.setDateOfProgram(Date.valueOf(dateOfProgram.toLocalDate()));
+            ;
             currentList = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
                     .search(srchProgramSlot);
-        } catch (SQLException  e) {
+        } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -62,12 +68,14 @@ public class ScheduleService {
     }
 
     /**
+     * Retrieves representation of all instance of resource from persistent data
+     * table
      *
      * @return @throws SQLException
      */
     public List<ProgramSlot> getAllProgramSlots() {
         //TODO return proper representation object
-       ArrayList<ProgramSlot> currentList = new ArrayList<ProgramSlot>();
+        ArrayList<ProgramSlot> currentList = new ArrayList<ProgramSlot>();
         try {
             currentList = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
                     .loadAll();
@@ -79,6 +87,8 @@ public class ScheduleService {
     }
 
     /**
+     * Retrieves representation of an instance of resource from persistent data
+     * table
      *
      * @return
      */
@@ -98,6 +108,8 @@ public class ScheduleService {
     }
 
     /**
+     * Updates representation of an instance of resource to persistent data
+     * table
      *
      * @param input
      * @throws SQLException

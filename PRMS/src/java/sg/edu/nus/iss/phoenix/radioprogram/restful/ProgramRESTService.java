@@ -5,10 +5,10 @@
  */
 package sg.edu.nus.iss.phoenix.radioprogram.restful;
 
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -21,6 +21,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import sg.edu.nus.iss.phoenix.core.restful.JSONEnvelop;
 import sg.edu.nus.iss.phoenix.radioprogram.entity.RadioProgram;
 import sg.edu.nus.iss.phoenix.radioprogram.service.ProgramService;
 
@@ -35,7 +36,7 @@ public class ProgramRESTService {
 
     @Context
     private UriInfo context;
-    
+
     private ProgramService service;
 
     /**
@@ -45,36 +46,27 @@ public class ProgramRESTService {
         service = new ProgramService();
     }
 
-    /**
-     * Retrieves representation of an instance of resource
-     * @return an instance of resource
-     */
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public RadioProgram getRadioProgram() {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
-    }
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public RadioPrograms getAllRadioPrograms() {
+    public JSONEnvelop<List<RadioProgram>> getAllRadioPrograms() {
         ArrayList<RadioProgram> rplist = service.findAllRP();
         RadioPrograms rpsList = new RadioPrograms();
         rpsList.setRpList(new ArrayList<RadioProgram>());
-        
+
         for (int i = 0; i < rplist.size(); i++) {
             rpsList.getRpList().add(
-                new RadioProgram(rplist.get(i).getName(), 
-                    rplist.get(i).getDescription(), 
-                    rplist.get(i).getTypicalDuration()));
+                    new RadioProgram(rplist.get(i).getName(),
+                            rplist.get(i).getDescription(),
+                            rplist.get(i).getTypicalDuration()));
         }
 
-        return rpsList;
+        return new JSONEnvelop<List<RadioProgram>>(rplist, null);
     }
-    
+
     /**
      * PUT method for updating or creating an instance of resource
+     *
      * @param content representation for the resource
      */
     @POST
@@ -83,9 +75,10 @@ public class ProgramRESTService {
     public void updateRadioProgram(RadioProgram rp) {
         service.processModify(rp);
     }
-    
+
     /**
      * POST method for creating an instance of resource
+     *
      * @param content representation for the resource
      */
     @PUT
@@ -94,9 +87,10 @@ public class ProgramRESTService {
     public void createRadioProgram(RadioProgram rp) {
         service.processCreate(rp);
     }
-   
+
     /**
      * DELETE method for deleting an instance of resource
+     *
      * @param name name of the resource
      */
     @DELETE
@@ -104,13 +98,25 @@ public class ProgramRESTService {
     @Consumes(MediaType.APPLICATION_JSON)
     public void deleteRadioProgram(@PathParam("rpname") String name) {
         String name2;
-        try { 
+        try {
             name2 = URLDecoder.decode(name, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             return;
         }
 
         service.processDelete(name2);
+    }
+
+    /**
+     * Retrieves representation of an instance of resource
+     *
+     * @return an instance of resource
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public RadioProgram getRadioProgram() {
+        //TODO return proper representation object
+        throw new UnsupportedOperationException();
     }
 }

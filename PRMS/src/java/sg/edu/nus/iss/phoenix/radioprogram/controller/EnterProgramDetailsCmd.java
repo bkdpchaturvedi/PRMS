@@ -9,6 +9,7 @@ import at.nocturne.api.Action;
 import at.nocturne.api.Perform;
 import java.io.IOException;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,6 +26,7 @@ import sg.edu.nus.iss.phoenix.radioprogram.entity.RadioProgram;
  */
 @Action("enterrp")
 public class EnterProgramDetailsCmd implements Perform {
+
     @Override
     public String perform(String path, HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         ProgramDelegate del = new ProgramDelegate();
@@ -33,17 +35,17 @@ public class EnterProgramDetailsCmd implements Perform {
         rp.setDescription(req.getParameter("description"));
         String dur = req.getParameter("typicalDuration");
         System.out.println(rp.toString());
-        Time t = Time.valueOf(dur);
+        LocalTime t = LocalTime.parse(dur);
         rp.setTypicalDuration(t);
         String ins = (String) req.getParameter("ins");
         Logger.getLogger(getClass().getName()).log(Level.INFO,
-                        "Insert Flag: " + ins);
+                "Insert Flag: " + ins);
         if (ins.equalsIgnoreCase("true")) {
-                del.processCreate(rp);
+            del.processCreate(rp);
         } else {
-                del.processModify(rp);
+            del.processModify(rp);
         }
-        
+
         ReviewSelectProgramDelegate rsdel = new ReviewSelectProgramDelegate();
         List<RadioProgram> data = rsdel.reviewSelectRadioProgram();
         req.setAttribute("rps", data);
