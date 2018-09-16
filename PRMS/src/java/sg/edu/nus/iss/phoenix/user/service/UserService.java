@@ -6,6 +6,7 @@
 package sg.edu.nus.iss.phoenix.user.service;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import sg.edu.nus.iss.phoenix.authenticate.entity.Role;
 import sg.edu.nus.iss.phoenix.authenticate.entity.User;
 import sg.edu.nus.iss.phoenix.core.dao.DAOFactory;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
+import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 
 /**
  *
@@ -25,85 +27,98 @@ public class UserService {
 
     public UserService() {
     }
-    
-    private static final Logger logger = 
-			Logger.getLogger(UserService.class.getName());
+
+    private static final Logger logger
+            = Logger.getLogger(UserService.class.getName());
+
     /**
      * assign/remove user roles based on the action selected
+     *
      * @param input
-     * @return 
+     * @return
      */
-    public boolean assignRemoveUserRoles(User input)
-    {
+    public boolean assignRemoveUserRoles(User input) {
         throw new UnsupportedOperationException();
     }
+
     /**
-     * 
+     *
      * @param currentRoles
-     * @param existingRoles 
+     * @param existingRoles
      */
-    public void compare(List<Role> currentRoles, List<Role> existingRoles){
-         throw new UnsupportedOperationException();
-    }
-    
-    /**
-     * 
-     * @param input 
-     */
-    public void createUser(User input){
+    public void compare(List<Role> currentRoles, List<Role> existingRoles) {
         throw new UnsupportedOperationException();
-    
     }
+
     /**
-     * 
-     * @param input 
-     */
-    public void updateUser(User input){
-        throw new UnsupportedOperationException();
-    
-    }
-    /**
-     * 
-     * @param input 
-     */
-    public void deleteUser(String id){
-        throw new UnsupportedOperationException();
-    
-    }
-    /**
-     * 
-     * @return 
-     */
-    public User[] findAllPresenters(){
-        throw new UnsupportedOperationException();
-    
-    }
-    /**
-     * 
-     * @return 
-     */
-    public User[] findAllProducers(){
-        throw new UnsupportedOperationException();
-    
-    }
-    
-    /**
-     * 
-     * @return 
-     */
-    public User[] getAllUsers(){
-        throw new UnsupportedOperationException();
-    
-    }
-    /**
-     * 
+     *
      * @param input
-     * @return 
+     */
+    public void createUser(User input) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    /**
+     *
+     * @param input
+     */
+    public void updateUser(User input) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    /**
+     *
+     * @param input
+     */
+    public void deleteUser(String id) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<User> findAllPresenters() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<User> findAllProducers() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<User> getAllUsers() {
+        ArrayList<User> currentList = new ArrayList<User>();
+        try {
+            currentList = (ArrayList<User>) DAOFactory.getUserDAO()
+                    .loadAll();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return currentList;
+    }
+
+    /**
+     *
+     * @param input
+     * @return
      */
     public User getUser(User input) {
         //TODO return proper representation object
         throw new UnsupportedOperationException();
     }
-    
-    
+
 }
