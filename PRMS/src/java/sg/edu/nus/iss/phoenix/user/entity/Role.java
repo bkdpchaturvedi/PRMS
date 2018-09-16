@@ -1,4 +1,4 @@
-package sg.edu.nus.iss.phoenix.authenticate.entity;
+package sg.edu.nus.iss.phoenix.user.entity;
 
 import java.io.Serializable;
 

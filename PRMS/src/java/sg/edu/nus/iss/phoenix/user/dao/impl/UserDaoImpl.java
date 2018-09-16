@@ -1,4 +1,4 @@
-package sg.edu.nus.iss.phoenix.authenticate.dao.impl;
+package sg.edu.nus.iss.phoenix.user.dao.impl;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import sg.edu.nus.iss.phoenix.authenticate.dao.UserDao;
-import sg.edu.nus.iss.phoenix.authenticate.entity.Role;
-import sg.edu.nus.iss.phoenix.authenticate.entity.User;
+import sg.edu.nus.iss.phoenix.user.dao.UserDao;
+import sg.edu.nus.iss.phoenix.user.entity.Role;
+import sg.edu.nus.iss.phoenix.user.entity.User;
 import sg.edu.nus.iss.phoenix.core.dao.DBConstants;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 
@@ -292,15 +292,15 @@ public class UserDaoImpl implements UserDao {
 			if (first) {
 				first = false;
 			}
-			sql.append("AND id = ").append(valueObject.getId()).append(" ");
+			sql.append("AND id = '").append(valueObject.getId()).append("' ");
 		}
 
 		if (valueObject.getPassword() != null) {
 			if (first) {
 				first = false;
 			}
-			sql.append("AND password LIKE '").append(valueObject.getPassword())
-					.append("%' ");
+			sql.append("AND password = '").append(valueObject.getPassword())
+					.append("' ");
 		}
 
 		if (valueObject.getName() != null) {
@@ -311,7 +311,7 @@ public class UserDaoImpl implements UserDao {
 					.append("%' ");
 		}
 
-		if (valueObject.getRoles().get(0).getRole() != null) {
+		if (valueObject.getRoles().size() > 0 && valueObject.getRoles().get(0).getRole() != null) {
 			if (first) {
 				first = false;
 			}

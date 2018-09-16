@@ -1,9 +1,9 @@
-package sg.edu.nus.iss.phoenix.authenticate.dao;
+package sg.edu.nus.iss.phoenix.user.dao;
 
 import java.sql.SQLException;
 import java.util.List;
 
-import sg.edu.nus.iss.phoenix.authenticate.entity.Role;
+import sg.edu.nus.iss.phoenix.user.entity.Role;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 
 public interface RoleDao {

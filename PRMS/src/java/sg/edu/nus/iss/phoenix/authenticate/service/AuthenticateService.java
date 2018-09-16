@@ -6,60 +6,70 @@ import java.util.List;
 
 import java.util.logging.*;
 
-import sg.edu.nus.iss.phoenix.authenticate.dao.RoleDao;
-import sg.edu.nus.iss.phoenix.authenticate.dao.UserDao;
-import sg.edu.nus.iss.phoenix.authenticate.entity.Role;
-import sg.edu.nus.iss.phoenix.authenticate.entity.User;
+import sg.edu.nus.iss.phoenix.user.dao.RoleDao;
+import sg.edu.nus.iss.phoenix.user.dao.UserDao;
+import sg.edu.nus.iss.phoenix.user.entity.Role;
+import sg.edu.nus.iss.phoenix.user.entity.User;
 import sg.edu.nus.iss.phoenix.core.dao.DAOFactory;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 
 public class AuthenticateService {
 
-	private static final Logger logger = 
-			Logger.getLogger(AuthenticateService.class.getName());
+    private static final Logger logger
+            = Logger.getLogger(AuthenticateService.class.getName());
 
-	//The user that we pass in to authenticate is different from the
-	//instance that is returned
-	public User validateUserIdPassword(final User toAuth) {
-		User found = null;
-		try {
-			found = DAOFactory.getUserDAO().searchMatching(toAuth.getId());
-		} catch (SQLException ex) {
-			logger.log(Level.SEVERE, "user searchMatching", ex);
-			return (null);
-		}
-		if (null == found)
-			return (null);
+    //The user that we pass in to authenticate is different from the
+    //instance that is returned
+    public User validateUserIdPassword(final User toAuth) {
+        User found = null;
+        //Password must be provided
+        if (toAuth.getPassword() == null) {
+            return (null);
+        }
+        try {
+            List<User> matches = DAOFactory.getUserDAO().searchMatching(toAuth);
+            if (matches.size() != 1) {
+                return (null);
+            }
+            found = matches.get(0);
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "user searchMatching", ex);
+            return (null);
+        }
+        if (null == found) {
+            return (null);
+        }
 
-		//Populate the roles
-		try {
-			for (Role r: found.getRoles()) {
-				Role _role = DAOFactory.getRoleDAO().searchMatching(r.getRole());
-				//Should we do something with roles that are without access privilege?
-				if (null != _role)
-					r.setAccessPrivilege(_role.getAccessPrivilege());
-			}
-		} catch (SQLException ex) {
-			logger.log(Level.SEVERE, "user searchMatching", ex);
-		}
+        //Populate the roles
+        try {
+            for (Role r : found.getRoles()) {
+                Role _role = DAOFactory.getRoleDAO().searchMatching(r.getRole());
+                //Should we do something with roles that are without access privilege?
+                if (null != _role) {
+                    r.setAccessPrivilege(_role.getAccessPrivilege());
+                }
+            }
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "user searchMatching", ex);
+        }
 
-		return (found);
-	}
+        return (found);
+    }
 
-	public User evaluateAccessPreviledge(User user) {
-		try {
-			Role role = DAOFactory.getRoleDAO().getObject(user.getRoles().get(0).getRole());
-			//user.setAccessPrivilege(role.getAccessPrivilege());
-			return user;
-		} catch (NotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return user;
-	}
+    public User evaluateAccessPreviledge(User user) {
+        try {
+            Role role = DAOFactory.getRoleDAO().getObject(user.getRoles().get(0).getRole());
+            //user.setAccessPrivilege(role.getAccessPrivilege());
+            return user;
+        } catch (NotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return user;
+    }
 }
 
 //package sg.edu.nus.iss.phoenix.authenticate.service;

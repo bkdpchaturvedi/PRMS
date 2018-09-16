@@ -17,7 +17,7 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import sg.edu.nus.iss.phoenix.authenticate.entity.User;
+import sg.edu.nus.iss.phoenix.user.entity.User;
 import sg.edu.nus.iss.phoenix.authenticate.service.AuthenticateService;
 
 /**

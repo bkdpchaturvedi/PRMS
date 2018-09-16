@@ -7,7 +7,7 @@ package sg.edu.nus.iss.phoenix.schedule.entity;
 
 import java.io.Serializable;
 import java.sql.Date;
-import sg.edu.nus.iss.phoenix.authenticate.entity.User;
+import sg.edu.nus.iss.phoenix.user.entity.User;
 import sg.edu.nus.iss.phoenix.radioprogram.entity.RadioProgram;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
