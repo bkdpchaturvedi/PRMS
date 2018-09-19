@@ -7,10 +7,6 @@ package sg.edu.nus.iss.phoenix.schedule.service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import sg.edu.nus.iss.phoenix.authenticate.service.*;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -28,7 +24,7 @@ import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
 
 /**
  *
- * @author Drake
+ * @author MyatMin
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ScheduleServiceTest {
@@ -66,7 +62,7 @@ public class ScheduleServiceTest {
     }
 
     @Test
-    public void test1CreateProgramSlot() {
+    public void test3_createProgramSlot_withNewPeriod_shouldCreate() {
         try {
             service.createProgramSlot(toProgramSlot);
         } catch (Exception ex) {
@@ -75,17 +71,26 @@ public class ScheduleServiceTest {
     }
 
     @Test
-    public void test2OverlapProgramSlot() throws OverlapException, NotFoundException, DuplicateException {
+    public void test4_overlapProgramSlot_withOverlapPeriod_shouldThrowOverlap() throws OverlapException, NotFoundException, DuplicateException {
         thrown.expect(OverlapException.class);
         service.createProgramSlot(toProgramSlot);
     }
 
     @Test
-    public void test3CreateProgramSlotWiithInvalidPrimaryKeys() throws OverlapException, NotFoundException, DuplicateException {
-        thrown.expect(OverlapException.class);
+    public void test1_createProgramSlot_withNotExistedKeys_shouldThrowNotFound() throws OverlapException, NotFoundException, DuplicateException {
+        thrown.expect(NotFoundException.class);
         toProgramSlot.getRadioProgram().setName("spell");
         toProgramSlot.getPresenter().setId("wizard");
         toProgramSlot.getProducer().setId("wizard");
+        service.createProgramSlot(toProgramSlot);
+    }
+
+    @Test
+    public void test2_createProgramSlot_withNullKeys_shouldThrowNotFound() throws OverlapException, NotFoundException, DuplicateException {
+        thrown.expect(NotFoundException.class);
+        toProgramSlot.getRadioProgram().setName(null);
+        toProgramSlot.getPresenter().setId(null);
+        toProgramSlot.getProducer().setId(null);
         service.createProgramSlot(toProgramSlot);
     }
 

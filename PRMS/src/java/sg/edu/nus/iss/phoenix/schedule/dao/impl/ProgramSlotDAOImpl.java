@@ -44,7 +44,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
                     + " OR ADDTIME(DateOfProgram, duration) between '" + programSlotStarts + "' and '" + programSlotEnds + "' "
                     + " OR (DateOfProgram < '" + programSlotStarts + "' AND ADDTIME(DateOfProgram, duration) > '" + programSlotEnds + "')";
             List<ProgramSlot> searchResults = listQuery(connection.prepareStatement(sql));
-            return searchResults.isEmpty();
+            return !searchResults.isEmpty();
         } finally {
             closeConnection();
         }
@@ -56,7 +56,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
         PreparedStatement preparedStatement = null;
         openConnection();
         try {
-            sql = "INSERT INTO `phoenix`.`program-slot` (`dateOfProgram`, `duration`, `program-name`, `presenter`, `producer`, `assingedBy`) VALUES (?,?,?,?,?,?);";
+            sql = "INSERT INTO `phoenix`.`program-slot` (`dateOfProgram`, `duration`, `program-name`, `presenter`, `producer`, `assignedBy`) VALUES (?,?,?,?,?,?);";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setTimestamp(1, Timestamp.valueOf(input.getDateOfProgram()));
             preparedStatement.setTime(2, Time.valueOf(input.getDuration()));
