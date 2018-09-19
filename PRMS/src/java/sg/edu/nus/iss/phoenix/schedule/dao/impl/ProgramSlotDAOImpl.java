@@ -37,7 +37,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
     public Boolean checkOverlap(ProgramSlot input) throws SQLException {
         openConnection();
         LocalDateTime programSlotStarts = input.getDateOfProgram();
-        LocalDateTime programSlotEnds = input.getDateOfProgram().plusSeconds(input.getDuration().getSecond());
+        LocalDateTime programSlotEnds = input.getDateOfProgram().plusSeconds(input.getDuration().toSecondOfDay());
         try {
             String sql = "SELECT * FROM `program-slot`"
                     + " WHERE DateOfProgram between '" + programSlotStarts + "' and '" + programSlotEnds + "' "

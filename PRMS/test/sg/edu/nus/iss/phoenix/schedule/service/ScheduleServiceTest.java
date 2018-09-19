@@ -71,7 +71,29 @@ public class ScheduleServiceTest {
     }
 
     @Test
-    public void test4_overlapProgramSlot_withOverlapPeriod_shouldThrowOverlap() throws OverlapException, NotFoundException, DuplicateException {
+    public void test4_overlapProgramSlot_withExactDateOfProgram_shouldThrowOverlap() throws OverlapException, NotFoundException, DuplicateException {
+        thrown.expect(OverlapException.class);
+        service.createProgramSlot(toProgramSlot);
+    }
+    
+    @Test
+    public void test5_overlapProgramSlot_withIntersetWithEndPeriod_shouldThrowOverlap() throws OverlapException, NotFoundException, DuplicateException {
+        toProgramSlot.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
+        thrown.expect(OverlapException.class);
+        service.createProgramSlot(toProgramSlot);
+    }
+    
+    @Test
+    public void test6_overlapProgramSlot_withIntersetWithFrontPeriod_shouldThrowOverlap() throws OverlapException, NotFoundException, DuplicateException {
+        toProgramSlot.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:05:00"));
+        thrown.expect(OverlapException.class);
+        service.createProgramSlot(toProgramSlot);
+    }
+    
+    @Test
+    public void test7_overlapProgramSlot_withIntersetWithWholePeriod_shouldThrowOverlap() throws OverlapException, NotFoundException, DuplicateException {
+        toProgramSlot.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
+        toProgramSlot.setDuration(LocalTime.parse("00:20:00"));
         thrown.expect(OverlapException.class);
         service.createProgramSlot(toProgramSlot);
     }
