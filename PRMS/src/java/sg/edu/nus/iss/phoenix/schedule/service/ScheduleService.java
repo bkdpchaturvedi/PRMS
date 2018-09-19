@@ -56,7 +56,7 @@ public class ScheduleService {
         ArrayList<ProgramSlot> currentList = new ArrayList<ProgramSlot>();
         try {
             ProgramSlot srchProgramSlot = DAOFactory.getProgramSlotDAO().createValueObject();
-            srchProgramSlot.setDateOfProgram(Date.valueOf(dateOfProgram.toLocalDate()));
+            srchProgramSlot.setDateOfProgram(dateOfProgram);
             ;
             currentList = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
                     .search(srchProgramSlot);

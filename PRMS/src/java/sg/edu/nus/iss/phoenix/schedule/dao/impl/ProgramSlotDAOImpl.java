@@ -86,9 +86,8 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
                 try {
                     RadioProgram tempRP = programDAO.getObject(result.getString("program-name"));
                     temp.setRadioProgram(tempRP);
-                    temp.setDateOfProgram(result.getDate("dateOfProgram"));
+                    temp.setDateOfProgram(result.getTimestamp("dateOfProgram").toLocalDateTime());
                     temp.setDuration(result.getTime("duration").toLocalTime());
-                    temp.setStartTime(result.getDate("startTime").toLocalDate().atStartOfDay());
                     /*
                         Need to Add Present and Producer logic 
                     */

@@ -5,12 +5,14 @@
  */
 package sg.edu.nus.iss.phoenix.authenticate.service;
 
+import java.util.ArrayList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import sg.edu.nus.iss.phoenix.user.entity.Role;
 import sg.edu.nus.iss.phoenix.user.entity.User;
 
 /**
@@ -18,56 +20,79 @@ import sg.edu.nus.iss.phoenix.user.entity.User;
  * @author Drake
  */
 public class AuthenticateServiceTest {
-    
-    private User loginUser;
-    private User authenticatedUser;
+
+    private User toUser;
+    private User returnUser;
     private static AuthenticateService service;
-    
+
     public AuthenticateServiceTest() {
-        
+
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
         service = new AuthenticateService();
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
         service = null;
     }
-    
+
     @Before
     public void setUp() {
-        loginUser = new User();
-        loginUser.setId("pointyhead");
+        toUser = new User();
+        toUser.setId("pointyhead");
     }
-    
+
     @After
     public void tearDown() {
-        loginUser = null;
-        authenticatedUser = null;
+        toUser = null;
+        returnUser = null;
     }
-    
+
     @Test
     public void testValidLogin() {
-        loginUser.setPassword("pointyhead");
-        authenticatedUser = service.validateUserIdPassword(loginUser);
-        assertNotNull(authenticatedUser);
-        assertNotNull(authenticatedUser.getRoles());
+        toUser.setPassword("pointyhead");
+        assertNull(returnUser);
+        returnUser = service.validateUserIdPassword(toUser);
+        assertNotNull(returnUser);
+        assertNotNull(returnUser.getRoles());
     }
-    
+
     @Test
     public void testInvalidLogin() {
-        loginUser.setPassword("test");
-        authenticatedUser = service.validateUserIdPassword(loginUser);
-        assertNull(authenticatedUser);
+        toUser.setPassword("test");
+        assertNull(returnUser);
+        returnUser = service.validateUserIdPassword(toUser);
+        assertNull(returnUser);
     }
-    
+
     @Test
     public void testInvalidUser() {
-        loginUser.setId("ghost");
-        authenticatedUser = service.validateUserIdPassword(loginUser);
-        assertNull(authenticatedUser);
+        toUser.setId("ghost");
+        assertNull(returnUser);
+        returnUser = service.validateUserIdPassword(toUser);
+        assertNull(returnUser);
+    }
+
+    @Test
+    public void testEvaluateAccessPreviledge() {
+        toUser.setRoles(new ArrayList<Role>() {
+            {
+                add(new Role("manager"));
+                add(new Role("producer"));
+                add(new Role("presenter"));
+                add(new Role("admin"));
+                add(new Role("ghost"));
+            }
+        });
+        assertNull(returnUser);
+        returnUser = service.evaluateAccessPreviledge(toUser);
+        assertNotNull(returnUser.getRoles().get(0).getAccessPrivilege());
+        assertNotNull(returnUser.getRoles().get(1).getAccessPrivilege());
+        assertNotNull(returnUser.getRoles().get(2).getAccessPrivilege());
+        assertNotNull(returnUser.getRoles().get(3).getAccessPrivilege());
+        assertNull(returnUser.getRoles().get(4).getAccessPrivilege());
     }
 }

@@ -58,8 +58,12 @@ public class AuthenticateService {
 
     public User evaluateAccessPreviledge(User user) {
         try {
-            Role role = DAOFactory.getRoleDAO().getObject(user.getRoles().get(0).getRole());
-            //user.setAccessPrivilege(role.getAccessPrivilege());
+            for (Role r : user.getRoles()) {
+                Role role = DAOFactory.getRoleDAO().getObject(r.getRole());
+                if (role != null) {
+                    r.setAccessPrivilege(role.getAccessPrivilege());
+                }
+            }
             return user;
         } catch (NotFoundException e) {
             // TODO Auto-generated catch block
