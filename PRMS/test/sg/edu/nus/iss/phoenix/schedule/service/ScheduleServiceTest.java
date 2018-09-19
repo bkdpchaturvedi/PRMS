@@ -21,6 +21,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.MethodSorters;
+import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
@@ -74,13 +75,13 @@ public class ScheduleServiceTest {
     }
 
     @Test
-    public void test2OverlapProgramSlot() throws OverlapException, NotFoundException {
+    public void test2OverlapProgramSlot() throws OverlapException, NotFoundException, DuplicateException {
         thrown.expect(OverlapException.class);
         service.createProgramSlot(toProgramSlot);
     }
 
     @Test
-    public void test3CreateProgramSlotWiithInvalidPrimaryKeys() throws OverlapException, NotFoundException {
+    public void test3CreateProgramSlotWiithInvalidPrimaryKeys() throws OverlapException, NotFoundException, DuplicateException {
         thrown.expect(OverlapException.class);
         toProgramSlot.getRadioProgram().setName("spell");
         toProgramSlot.getPresenter().setId("wizard");
