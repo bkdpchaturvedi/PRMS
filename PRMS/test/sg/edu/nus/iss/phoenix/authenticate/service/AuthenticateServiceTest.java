@@ -62,7 +62,7 @@ public class AuthenticateServiceTest {
 
     @Test
     public void testInvalidLogin() {
-        toUser.setPassword("test");
+        toUser.setPassword("spell");
         assertNull(returnUser);
         returnUser = service.validateUserIdPassword(toUser);
         assertNull(returnUser);
@@ -70,7 +70,7 @@ public class AuthenticateServiceTest {
 
     @Test
     public void testInvalidUser() {
-        toUser.setId("ghost");
+        toUser.setId("wizard");
         assertNull(returnUser);
         returnUser = service.validateUserIdPassword(toUser);
         assertNull(returnUser);
@@ -84,7 +84,7 @@ public class AuthenticateServiceTest {
                 add(new Role("producer"));
                 add(new Role("presenter"));
                 add(new Role("admin"));
-                add(new Role("ghost"));
+                add(new Role("wizard"));
             }
         });
         assertNull(returnUser);

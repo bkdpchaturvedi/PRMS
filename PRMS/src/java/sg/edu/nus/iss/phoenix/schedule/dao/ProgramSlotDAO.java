@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 
@@ -35,8 +36,9 @@ public interface ProgramSlotDAO {
      *
      * @param input the program slot class instance
      * @return boolean
+     * @throws java.sql.SQLException
      */
-    public abstract Boolean checkOverlap(ProgramSlot input);
+    public abstract Boolean checkOverlap(ProgramSlot input) throws SQLException;
 
     /**
      * create-method. This will create new row in database according to supplied
@@ -52,7 +54,7 @@ public interface ProgramSlotDAO {
      * @throws java.sql.SQLException
      */
     public abstract void create(ProgramSlot input)
-            throws SQLException;
+            throws DuplicateException, SQLException;
 
     /**
      * delete-method. This method will remove the information from database as

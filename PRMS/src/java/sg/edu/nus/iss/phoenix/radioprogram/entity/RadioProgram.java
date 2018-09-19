@@ -64,34 +64,35 @@ public class RadioProgram implements Cloneable, Serializable {
     public void setDescription(String descriptionIn) {
         this.description = descriptionIn;
     }
-@JsonbDateFormat("##default")
+
+    @JsonbDateFormat("##default")
     public LocalTime getTypicalDuration() {
         return this.typicalDuration;
     }
-@JsonbDateFormat("##default")
+
+    @JsonbDateFormat("##default")
     public void setTypicalDuration(LocalTime typicalDurationIn) {
         this.typicalDuration = typicalDurationIn;
     }
 
-//
-//    /** 
-//     * setAll allows to set all persistent variables in one method call.
-//     * This is useful, when all data is available and it is needed to 
-//     * set the initial state of this object. Note that this method will
-//     * directly modify instance variables, without going trough the 
-//     * individual set-methods.
-//     * @param nameIn
-//     * @param descriptionIn
-//     * @param typicalDurationIn
-//     */
-//
-//    public void setAll(String nameIn,
-//          String descriptionIn,
-//          Time typicalDurationIn) {
-//          this.name = nameIn;
-//          this.description = descriptionIn;
-//          this.typicalDuration = typicalDurationIn;
-//    }
+    /**
+     * appointAll allows to set all persistent variables in one method call. This is
+     * useful, when all data is available and it is needed to set the initial
+     * state of this object. Note that this method will directly modify instance
+     * variables, without going trough the individual set-methods.
+     *
+     * @param nameIn
+     * @param descriptionIn
+     * @param typicalDurationIn
+     */
+    public void appointAll(String nameIn,
+            String descriptionIn,
+            LocalTime typicalDurationIn) {
+        this.name = nameIn;
+        this.description = descriptionIn;
+        this.typicalDuration = typicalDurationIn;
+    }
+
     /**
      * hasEqualMapping-method will compare two RadioProgram instances and return
      * true if they contain same values in all persistent instance variables. If

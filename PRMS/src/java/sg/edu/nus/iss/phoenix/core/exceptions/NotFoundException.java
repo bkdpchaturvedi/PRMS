@@ -1,7 +1,7 @@
 package sg.edu.nus.iss.phoenix.core.exceptions;
 
 /**
- * NotFoundException exception. This exception will be thrown from Dao object if
+ * NotFoundException. This exception will be thrown from Dao object if
  * load, update or delete for one object fails to find the correct row.
  **/
 

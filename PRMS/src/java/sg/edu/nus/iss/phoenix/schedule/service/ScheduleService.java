@@ -7,12 +7,17 @@ package sg.edu.nus.iss.phoenix.schedule.service;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import sg.edu.nus.iss.phoenix.core.dao.DAOFactory;
+import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
+import sg.edu.nus.iss.phoenix.core.exceptions.ServiceException;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
+import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
 
 /**
  *
@@ -20,6 +25,8 @@ import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
  */
 public class ScheduleService {
 
+    private static final Logger LOG = Logger.getLogger(ScheduleService.class.getName());
+    
     /**
      * Creates representation of an instance of resource to persistent data
      * table
@@ -27,11 +34,21 @@ public class ScheduleService {
      * @param input
      * @throws SQLException
      */
-    public void createProgramSlot(ProgramSlot input) throws SQLException {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+    public void createProgramSlot(ProgramSlot input) throws OverlapException, NotFoundException, DuplicateException {
+        try {
+            if (DAOFactory.getProgramSlotDAO().checkOverlap(input)) {
+                throw new OverlapException("Record exists on the given date time and duration.");
+            }
+            DAOFactory.getProgramSlotDAO().create(input);
+        }
+        catch (SQLIntegrityConstraintViolationException e) {
+            throw new NotFoundException("Cannot be created without valid primary key.");
+        }
+        catch (SQLException e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
     }
-
+    
     /**
      * Deletes representation of an instance of resource to persistent data
      * table
@@ -52,7 +69,6 @@ public class ScheduleService {
      * @throws SQLException
      */
     public List<ProgramSlot> findProgramSlots(LocalDateTime dateOfProgram) {
-        //TODO return proper representation object
         ArrayList<ProgramSlot> currentList = new ArrayList<ProgramSlot>();
         try {
             ProgramSlot srchProgramSlot = DAOFactory.getProgramSlotDAO().createValueObject();

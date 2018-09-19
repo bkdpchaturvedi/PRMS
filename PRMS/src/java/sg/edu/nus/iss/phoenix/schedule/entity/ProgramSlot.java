@@ -39,12 +39,13 @@ public class ProgramSlot implements Serializable, Cloneable {
     public ProgramSlot() {
     }
 
-    public ProgramSlot(LocalDateTime dateOfProgram, LocalTime duration, String radioProgram, String presenter, String producer) {
+    public ProgramSlot(LocalDateTime dateOfProgram, LocalTime duration, String radioProgram, String presenter, String producer, String assignedBy) {
         this.dateOfProgram = dateOfProgram;
         this.duration = duration;
         this.radioProgram = new RadioProgram(radioProgram);
         this.presenter = new User(presenter);
         this.producer = new User(producer);
+        this.assignedBy = assignedBy;
     }
 
     /**
@@ -99,6 +100,33 @@ public class ProgramSlot implements Serializable, Cloneable {
     }
 
     public void setAssignedBy(String assignedBy) {
+        this.assignedBy = assignedBy;
+    }
+
+    /**
+     * appointAll allows to set all persistent variables in one method call.
+     * This is useful, when all data is available and it is needed to set the
+     * initial state of this object. Note that this method will directly modify
+     * instance variables, without going trough the individual set-methods.
+     *
+     * @param dateOfProgram
+     * @param duration
+     * @param radioProgram
+     * @param presenter
+     * @param producer
+     * @param assignedBy
+     */
+    public void appointAll(LocalDateTime dateOfProgram,
+            LocalTime duration,
+            String radioProgram,
+            String presenter,
+            String producer,
+            String assignedBy) {
+        this.dateOfProgram = dateOfProgram;
+        this.duration = duration;
+        this.radioProgram = new RadioProgram(radioProgram);
+        this.presenter = new User(presenter);
+        this.producer = new User(producer);
         this.assignedBy = assignedBy;
     }
 
