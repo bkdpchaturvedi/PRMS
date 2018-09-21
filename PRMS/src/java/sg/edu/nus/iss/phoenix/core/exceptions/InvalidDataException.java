@@ -6,34 +6,35 @@
 package sg.edu.nus.iss.phoenix.core.exceptions;
 
 /**
- * DuplicateException. This exception will be thrown from DAO object if creating
- * for new object fails to create regarding of the primary key has been existed.
+ * InvalidDataException. This exception will be thrown from DAO object if
+ * creating for new object fails to create regarding of the primary key has been
+ * existed.
  *
  */
 /**
  *
  * @author MyatMin
  */
-public class DuplicateException extends Exception {
+public class InvalidDataException extends Exception {
 
     /**
-     * Constructor for DuplicateException. The input message is returned in
+     * Constructor for InvalidDataException. The input message is returned in
      * toString() message.
      *
      * @param message
      */
-    public DuplicateException(String message) {
+    public InvalidDataException(String message) {
         super(message);
     }
 
     /**
-     * Constructor for DuplicateException with cause. The input message is
+     * Constructor for InvalidDataException with cause. The input message is
      * returned in toString() message.
      *
      * @param message
      * @param cause
      */
-    public DuplicateException(String message, Throwable cause) {
+    public InvalidDataException(String message, Throwable cause) {
         super(message, cause);
     }
 }

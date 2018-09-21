@@ -6,10 +6,11 @@
 package sg.edu.nus.iss.phoenix.schedule.dao;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InUseException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 
@@ -41,6 +42,19 @@ public interface ProgramSlotDAO {
     public abstract Boolean checkOverlap(ProgramSlot input) throws SQLException;
 
     /**
+     * checkOverlap-method. This will check with the existing data from table
+     * using given data from input object contents whether their timing
+     * overlapping against each other or not but to discard checking against
+     * origin object.
+     *
+     * @param input the program slot class instance
+     * @param origin
+     * @return boolean
+     * @throws java.sql.SQLException
+     */
+    public abstract Boolean checkOverlap(ProgramSlot input, ProgramSlot origin) throws SQLException;
+
+    /**
      * create-method. This will create new row in database according to supplied
      * valueObject contents. Make sure that values for all NOT NULL columns are
      * correctly specified. Also, if this table does not use automatic
@@ -51,10 +65,12 @@ public interface ProgramSlotDAO {
      * @param input This parameter contains the class instance to be created. If
      * automatic surrogate-keys are not used the Primary-key field must be set
      * for this to work properly.
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException
      * @throws java.sql.SQLException
      */
     public abstract void create(ProgramSlot input)
-            throws DuplicateException, SQLException;
+            throws InvalidDataException, DuplicateException, SQLException;
 
     /**
      * delete-method. This method will remove the information from database as
@@ -134,6 +150,21 @@ public interface ProgramSlotDAO {
      */
     public abstract List<ProgramSlot> search(ProgramSlot input)
             throws SQLException;
+    
+    /**
+     * search-Method. This method provides searching capability to get matching
+     * valueObjects from database. It works by searching all objects that match
+     * permanent instance variables of given object. The
+     * result will be 0-N objects in a List, all matching those criteria you
+     * specified. Those instance-variables that have NULL values are excluded in
+     * search-criteria.
+     *
+     * @param year
+     * @return list of the class instance
+     * @throws java.sql.SQLException
+     */
+    public abstract List<ProgramSlot> search(Integer year)
+            throws SQLException;
 
     /**
      * update-method. This method will save the current state of input to
@@ -143,11 +174,15 @@ public interface ProgramSlotDAO {
      * database. If save can not find matching row, NotFoundException will be
      * thrown.
      *
-     * @param input This parameter contains the class instance to be
-     * saved. Primary-key field must be set for this to work properly.
+     * @param input This parameter contains the class instance to be saved.
+     * Primary-key field must be set for this to work properly.
+     * @param origin
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InUseException
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws java.sql.SQLException
      */
-    public abstract void update(ProgramSlot input)
-            throws NotFoundException, SQLException;
+    public abstract void update(ProgramSlot input, ProgramSlot origin)
+            throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException;
 }

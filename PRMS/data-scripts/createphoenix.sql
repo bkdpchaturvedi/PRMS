@@ -96,7 +96,7 @@ DROP TABLE IF EXISTS `phoenix`.`annual-schedule` ;
 
 CREATE  TABLE IF NOT EXISTS `phoenix`.`annual-schedule` (
   `year` INT NOT NULL ,
-  `assignedBy` VARCHAR(40) NULL ,
+  `assignedBy` VARCHAR(40) NOT NULL ,
   PRIMARY KEY (`year`) ,
   CONSTRAINT `id_as`
     FOREIGN KEY (`assignedBy` )
@@ -152,8 +152,8 @@ CREATE UNIQUE INDEX `dateOfProgram_UNIQUE` ON `phoenix`.`program-slot` (`dateOfP
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `phoenix`.`weekly-schedule` ;
 CREATE  TABLE IF NOT EXISTS `phoenix`.`weekly-schedule` (
-  `startDate` DATETIME NOT NULL ,
-  `assignedBy` VARCHAR(40) NULL ,
+  `startDate` DATE NOT NULL ,
+  `assignedBy` VARCHAR(40) NOT NULL ,
   PRIMARY KEY (`startDate`) ,
   CONSTRAINT `id_ws`
     FOREIGN KEY (`assignedBy` )

@@ -6,6 +6,8 @@
 package sg.edu.nus.iss.phoenix.schedule.dao;
 
 import java.sql.SQLException;
+import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 import sg.edu.nus.iss.phoenix.schedule.entity.AnnualSchedule;
 
@@ -37,8 +39,11 @@ public interface AnnualScheduleDAO {
      * automatic surrogate-keys are not used the Primary-key field must be set
      * for this to work properly.
      * @throws java.sql.SQLException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
      */
-    public abstract void create(AnnualSchedule input) throws SQLException;
+    public abstract void create(AnnualSchedule input)
+            throws SQLException, DuplicateException, InvalidDataException;
 
     /**
      * get-method. This will create and load valueObject contents from database
@@ -52,7 +57,8 @@ public interface AnnualScheduleDAO {
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws java.sql.SQLException
      */
-    public abstract AnnualSchedule get(Integer year) throws SQLException, NotFoundException;
+    public abstract AnnualSchedule get(Integer year)
+            throws SQLException, NotFoundException;
 
     /**
      * load-method. This will load valueObject contents from database using
@@ -63,11 +69,12 @@ public interface AnnualScheduleDAO {
      * runtime variables. If load can not find matching row, NotFoundException
      * will be thrown.
      *
-     * @param input This parameter contains the class instance to be
-     * loaded. Primary-key field must be set for this to work properly.
+     * @param input This parameter contains the class instance to be loaded.
+     * Primary-key field must be set for this to work properly.
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws java.sql.SQLException
      *
      */
-    public abstract void load(AnnualSchedule input) throws SQLException, NotFoundException;
+    public abstract void load(AnnualSchedule input)
+            throws SQLException, NotFoundException;
 }

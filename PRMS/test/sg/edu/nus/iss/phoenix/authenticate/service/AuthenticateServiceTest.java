@@ -52,7 +52,7 @@ public class AuthenticateServiceTest {
     }
 
     @Test
-    public void testValidLogin() {
+    public void test1_validateUserIdPassword_withValidDetails_shouldRetrunUser() {
         toUser.setPassword("pointyhead");
         assertNull(returnUser);
         returnUser = service.validateUserIdPassword(toUser);
@@ -61,7 +61,7 @@ public class AuthenticateServiceTest {
     }
 
     @Test
-    public void testInvalidLogin() {
+    public void test2_validateUserIdPassword_withInvalidPassword_shouldReturnNull() {
         toUser.setPassword("spell");
         assertNull(returnUser);
         returnUser = service.validateUserIdPassword(toUser);
@@ -69,7 +69,7 @@ public class AuthenticateServiceTest {
     }
 
     @Test
-    public void testInvalidUser() {
+    public void test3_validateUserIdPassword_withInvalidUserId_shouldReturnNull() {
         toUser.setId("wizard");
         assertNull(returnUser);
         returnUser = service.validateUserIdPassword(toUser);
@@ -77,14 +77,13 @@ public class AuthenticateServiceTest {
     }
 
     @Test
-    public void testEvaluateAccessPreviledge() {
+    public void test4_evaluateAccessPreviledge_withExistsRoles_shouldReturnRoles() {
         toUser.setRoles(new ArrayList<Role>() {
             {
                 add(new Role("manager"));
                 add(new Role("producer"));
                 add(new Role("presenter"));
                 add(new Role("admin"));
-                add(new Role("wizard"));
             }
         });
         assertNull(returnUser);
@@ -93,6 +92,17 @@ public class AuthenticateServiceTest {
         assertNotNull(returnUser.getRoles().get(1).getAccessPrivilege());
         assertNotNull(returnUser.getRoles().get(2).getAccessPrivilege());
         assertNotNull(returnUser.getRoles().get(3).getAccessPrivilege());
-        assertNull(returnUser.getRoles().get(4).getAccessPrivilege());
+    }
+    
+        @Test
+    public void test5_evaluateAccessPreviledge_withExistsRoles_shouldReturnNull() {
+        toUser.setRoles(new ArrayList<Role>() {
+            {
+                add(new Role("wizard"));
+            }
+        });
+        assertNull(returnUser);
+        returnUser = service.evaluateAccessPreviledge(toUser);
+        assertNull(returnUser.getRoles().get(0).getAccessPrivilege());
     }
 }

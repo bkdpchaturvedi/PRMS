@@ -7,6 +7,8 @@ package sg.edu.nus.iss.phoenix.schedule.dao;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 import sg.edu.nus.iss.phoenix.schedule.entity.WeeklySchedule;
 
@@ -38,8 +40,10 @@ public interface WeeklyScheduleDAO {
      * automatic surrogate-keys are not used the Primary-key field must be set
      * for this to work properly.
      * @throws java.sql.SQLException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException
      */
-    public abstract void create(WeeklySchedule input) throws SQLException;
+    public abstract void create(WeeklySchedule input) throws SQLException, InvalidDataException, DuplicateException;
 
     /**
      * get-method. This will create and load valueObject contents from database

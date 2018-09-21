@@ -38,6 +38,10 @@ public class ProgramSlot implements Serializable, Cloneable {
      */
     public ProgramSlot() {
     }
+    
+    public ProgramSlot(LocalDateTime dateOfProgram) {
+        this.dateOfProgram = dateOfProgram;
+    }
 
     public ProgramSlot(LocalDateTime dateOfProgram, LocalTime duration, String radioProgram, String presenter, String producer, String assignedBy) {
         this.dateOfProgram = dateOfProgram;

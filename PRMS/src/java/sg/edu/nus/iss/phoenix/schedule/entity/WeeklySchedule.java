@@ -6,7 +6,7 @@
 package sg.edu.nus.iss.phoenix.schedule.entity;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 
 /**
  * WeeklySchedule Value Object. This class is value object representing database
@@ -20,7 +20,7 @@ public class WeeklySchedule implements Serializable, Cloneable {
      * Persistent Instance variables. This data is directly 
      * mapped to the columns of database table.
      */
-    private Date startDate;
+    private LocalDate startDate;
     private String assignedBy;
 
     /** 
@@ -32,7 +32,7 @@ public class WeeklySchedule implements Serializable, Cloneable {
     public WeeklySchedule() {
     }
 
-    public WeeklySchedule(Date startDate, String assignedBy) {
+    public WeeklySchedule(LocalDate startDate, String assignedBy) {
         this.startDate = startDate;
         this.assignedBy = assignedBy;
     }
@@ -43,11 +43,11 @@ public class WeeklySchedule implements Serializable, Cloneable {
      * so these might require some manual additions.
      * @return 
      */
-    public Date getSartDate() {
+    public LocalDate getSartDate() {
         return startDate;
     }
 
-    public void setSartDate(Date startDate) {
+    public void setSartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 

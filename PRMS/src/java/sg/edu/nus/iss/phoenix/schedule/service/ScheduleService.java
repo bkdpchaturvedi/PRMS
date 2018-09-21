@@ -5,18 +5,25 @@
  */
 package sg.edu.nus.iss.phoenix.schedule.service;
 
-import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import sg.edu.nus.iss.phoenix.core.dao.DAOFactory;
 import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InUseException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 import sg.edu.nus.iss.phoenix.core.exceptions.ServiceException;
+import sg.edu.nus.iss.phoenix.schedule.entity.AnnualSchedule;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
+import sg.edu.nus.iss.phoenix.schedule.entity.WeeklySchedule;
 import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
 
 /**
@@ -26,29 +33,30 @@ import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
 public class ScheduleService {
 
     private static final Logger LOG = Logger.getLogger(ScheduleService.class.getName());
-    
+
     /**
      * Creates representation of an instance of resource to persistent data
      * table
      *
      * @param input
-     * @throws SQLException
+     * @throws sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException
      */
-    public void createProgramSlot(ProgramSlot input) throws OverlapException, NotFoundException, DuplicateException {
+    public void createProgramSlot(ProgramSlot input)
+            throws OverlapException, InvalidDataException, DuplicateException {
         try {
+            populateSchedule(input);
             if (DAOFactory.getProgramSlotDAO().checkOverlap(input)) {
-                throw new OverlapException("Record exists on the given date time and duration.");
+                throw new OverlapException("Other Program Slot object exists on the given date time and duration.");
             }
             DAOFactory.getProgramSlotDAO().create(input);
-        }
-        catch (SQLIntegrityConstraintViolationException e) {
-            throw new NotFoundException("Cannot be created without valid primary key.");
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, null, e);
             throw new ServiceException(e.getMessage(), e);
         }
     }
-    
+
     /**
      * Deletes representation of an instance of resource to persistent data
      * table
@@ -66,6 +74,7 @@ public class ScheduleService {
      * table
      *
      * @param dateOfProgram
+     * @return
      * @throws SQLException
      */
     public List<ProgramSlot> findProgramSlots(LocalDateTime dateOfProgram) {
@@ -87,7 +96,7 @@ public class ScheduleService {
      * Retrieves representation of all instance of resource from persistent data
      * table
      *
-     * @return @throws SQLException
+     * @return
      */
     public List<ProgramSlot> getAllProgramSlots() {
         //TODO return proper representation object
@@ -114,24 +123,91 @@ public class ScheduleService {
     }
 
     /**
+     * Creating the relative representation of an instance of resources to
+     * persistent data table
      *
      * @param input
      * @throws SQLException
      */
-    private void populateSchedule(ProgramSlot input) throws SQLException {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+    private void populateSchedule(ProgramSlot input) throws DuplicateException, InvalidDataException {
+        try {
+            DAOFactory.getAnnualScheduleDAO().get(
+                    input.getDateOfProgram().get(WeekFields.ISO.weekBasedYear())
+            );
+        } catch (NotFoundException e) {
+            try {
+                DAOFactory.getAnnualScheduleDAO().create(
+                        new AnnualSchedule(
+                                input.getDateOfProgram().get(WeekFields.ISO.weekBasedYear()), 
+                                input.getAssignedBy()
+                        )
+                );
+                for (int i = 1; i <= 52; i++) {
+                    LocalDate startDate = LocalDate.ofYearDay(
+                            input.getDateOfProgram().get(WeekFields.ISO.weekBasedYear()), i
+                    ).with(
+                            WeekFields.ISO.weekOfYear(), i
+                    ).with(
+                            TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
+                    );
+                    DAOFactory.getWeeklyScheduleDAO().create(
+                            new WeeklySchedule(
+                                    startDate,
+                                    input.getAssignedBy()
+                            )
+                    );
+                }
+            } catch (SQLException e1) {
+                LOG.log(Level.SEVERE, null, e1);
+                throw new ServiceException(e.getMessage(), e);
+            }
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, null, e);
+            throw new ServiceException(e.getMessage(), e);
+        }
     }
 
+    /**
+     * Deleting the relative representation of an instance of resources to
+     * persistent data table
+     *
+     * @param input
+     * @throws SQLException
+     */
+    private void depopulateSchedule(ProgramSlot input) throws DuplicateException, InvalidDataException {
+        try {
+            DAOFactory.getProgramSlotDAO().search(
+                    input.getDateOfProgram().get(WeekFields.ISO.weekBasedYear())
+            );
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, null, e);
+            throw new ServiceException(e.getMessage(), e);
+        }
+    }
+    
     /**
      * Updates representation of an instance of resource to persistent data
      * table
      *
      * @param input
-     * @throws SQLException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InUseException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
+     * @throws sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException
      */
-    public void updateProgramSlot(ProgramSlot input) throws SQLException {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+    public void updateProgramSlot(ProgramSlot input, ProgramSlot origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
+        try {
+            populateSchedule(input);
+            if (DAOFactory.getProgramSlotDAO().checkOverlap(input, origin)) {
+                throw new OverlapException("Other Program Slot object exists on the given date time and duration.");
+            }
+            DAOFactory.getProgramSlotDAO().update(input, origin);
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, null, e);
+            throw new ServiceException(e.getMessage(), e);
+        }
     }
+    
+
 }

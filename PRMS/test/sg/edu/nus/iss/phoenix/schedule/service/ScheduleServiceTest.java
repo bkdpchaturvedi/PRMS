@@ -5,6 +5,7 @@
  */
 package sg.edu.nus.iss.phoenix.schedule.service;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.After;
@@ -18,6 +19,8 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.MethodSorters;
 import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InUseException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
@@ -62,7 +65,27 @@ public class ScheduleServiceTest {
     }
 
     @Test
-    public void test3_createProgramSlot_withNewPeriod_shouldCreate() {
+    public void test01_createProgramSlot_withNotExistedKeys_shouldThrowInvalidData() throws OverlapException, DuplicateException, InvalidDataException {
+        thrown.expect(InvalidDataException.class);
+        toProgramSlot.getRadioProgram().setName("spell");
+        toProgramSlot.getPresenter().setId("wizard");
+        toProgramSlot.getProducer().setId("wizard");
+        toProgramSlot.setAssignedBy("wizard");
+        service.createProgramSlot(toProgramSlot);
+    }
+
+    @Test
+    public void test02_createProgramSlot_withNullKeys_shouldThrowInvalidData() throws OverlapException, DuplicateException, InvalidDataException {
+        thrown.expect(InvalidDataException.class);
+        toProgramSlot.getRadioProgram().setName(null);
+        toProgramSlot.getPresenter().setId(null);
+        toProgramSlot.getProducer().setId(null);
+        toProgramSlot.setAssignedBy(null);
+        service.createProgramSlot(toProgramSlot);
+    }
+
+    @Test
+    public void test03_createProgramSlot_withNewPeriod_shouldCreate() {
         try {
             service.createProgramSlot(toProgramSlot);
         } catch (Exception ex) {
@@ -71,49 +94,80 @@ public class ScheduleServiceTest {
     }
 
     @Test
-    public void test4_overlapProgramSlot_withExactDateOfProgram_shouldThrowOverlap() throws OverlapException, NotFoundException, DuplicateException {
+    public void test04_createProgramSlot_withExactDateOfProgram_shouldThrowOverlap() throws OverlapException, DuplicateException, InvalidDataException {
         thrown.expect(OverlapException.class);
         service.createProgramSlot(toProgramSlot);
     }
-    
+
     @Test
-    public void test5_overlapProgramSlot_withIntersetWithEndPeriod_shouldThrowOverlap() throws OverlapException, NotFoundException, DuplicateException {
+    public void test05_createProgramSlot_withIntersetWithEndPeriod_shouldThrowOverlap() throws OverlapException, DuplicateException, InvalidDataException {
         toProgramSlot.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
         thrown.expect(OverlapException.class);
         service.createProgramSlot(toProgramSlot);
     }
-    
+
     @Test
-    public void test6_overlapProgramSlot_withIntersetWithFrontPeriod_shouldThrowOverlap() throws OverlapException, NotFoundException, DuplicateException {
+    public void test06_createProgramSlot_withIntersetWithFrontPeriod_shouldThrowOverlap() throws OverlapException, DuplicateException, InvalidDataException {
         toProgramSlot.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:05:00"));
         thrown.expect(OverlapException.class);
         service.createProgramSlot(toProgramSlot);
     }
-    
+
     @Test
-    public void test7_overlapProgramSlot_withIntersetWithWholePeriod_shouldThrowOverlap() throws OverlapException, NotFoundException, DuplicateException {
+    public void test07_createProgramSlot_withIntersetWithWholePeriod_shouldThrowOverlap() throws OverlapException, DuplicateException, InvalidDataException {
         toProgramSlot.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
         toProgramSlot.setDuration(LocalTime.parse("00:20:00"));
         thrown.expect(OverlapException.class);
         service.createProgramSlot(toProgramSlot);
     }
-
+    
     @Test
-    public void test1_createProgramSlot_withNotExistedKeys_shouldThrowNotFound() throws OverlapException, NotFoundException, DuplicateException {
-        thrown.expect(NotFoundException.class);
+    public void test08_updateProgramSlot_withNotExistedKeys_shouldThrowInvalidData() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException{
+        thrown.expect(InvalidDataException.class);
+        ProgramSlot origin = new ProgramSlot(LocalDateTime.parse("2000-01-01T00:00:00"));
+        toProgramSlot.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:05:00"));
         toProgramSlot.getRadioProgram().setName("spell");
         toProgramSlot.getPresenter().setId("wizard");
         toProgramSlot.getProducer().setId("wizard");
-        service.createProgramSlot(toProgramSlot);
+        toProgramSlot.setAssignedBy("wizard");
+        service.updateProgramSlot(toProgramSlot, origin);
     }
-
+    
     @Test
-    public void test2_createProgramSlot_withNullKeys_shouldThrowNotFound() throws OverlapException, NotFoundException, DuplicateException {
-        thrown.expect(NotFoundException.class);
+    public void test09_updateProgramSlot_withNullKeys_shouldThrowInvalidData() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException{
+        thrown.expect(InvalidDataException.class);
+        ProgramSlot origin = new ProgramSlot(LocalDateTime.parse("2000-01-01T00:00:00"));
+        toProgramSlot.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:05:00"));
         toProgramSlot.getRadioProgram().setName(null);
         toProgramSlot.getPresenter().setId(null);
         toProgramSlot.getProducer().setId(null);
-        service.createProgramSlot(toProgramSlot);
+        toProgramSlot.setAssignedBy(null);
+        service.updateProgramSlot(toProgramSlot, origin);
     }
-
+    
+    @Test
+    public void test10_updateProgramSlot_withNewPeriod_shouldUpdate() {
+        ProgramSlot origin = new ProgramSlot(toProgramSlot.getDateOfProgram());
+        toProgramSlot.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:05:00"));
+        try {
+            service.updateProgramSlot(toProgramSlot, origin);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void test11_updateProgramSlot_withNotValidOrigin_shouldThrowNotFound() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException{
+        ProgramSlot origin = new ProgramSlot(LocalDateTime.parse("2000-01-01T00:20:00"));
+        toProgramSlot.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:20:00"));
+        thrown.expect(NotFoundException.class);
+        service.updateProgramSlot(toProgramSlot, origin);
+    }
+    
+    @Test
+    public void test12_updateProgramSlot_withNotValidOrigin_shouldThrowOverlap() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException{
+        ProgramSlot origin = new ProgramSlot(LocalDateTime.parse("2000-01-01T00:00:00"));
+        thrown.expect(OverlapException.class);
+        service.updateProgramSlot(toProgramSlot, origin);
+    }
 }

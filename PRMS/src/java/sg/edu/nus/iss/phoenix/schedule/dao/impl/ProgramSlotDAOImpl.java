@@ -13,11 +13,17 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sg.edu.nus.iss.phoenix.core.dao.DBConnector;
 import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InUseException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 import sg.edu.nus.iss.phoenix.schedule.dao.ProgramSlotDAO;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
+import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
+import sg.edu.nus.iss.phoenix.utilities.ExceptionHelper;
 
 /**
  * ProgramSlot Data Access Object (DAO). This class contains all database
@@ -28,6 +34,8 @@ import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
  */
 public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
 
+    private static final Logger LOG = Logger.getLogger(ProgramSlotDAOImpl.class.getName());
+
     @Override
     public ProgramSlot createValueObject() {
         return new ProgramSlot();
@@ -35,47 +43,68 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
 
     @Override
     public Boolean checkOverlap(ProgramSlot input) throws SQLException {
+        return checkOverlap(input, null);
+    }
+
+    @Override
+    public Boolean checkOverlap(ProgramSlot input, ProgramSlot origin) throws SQLException {
         openConnection();
         LocalDateTime programSlotStarts = input.getDateOfProgram();
         LocalDateTime programSlotEnds = input.getDateOfProgram().plusSeconds(input.getDuration().toSecondOfDay());
         try {
             String sql = "SELECT * FROM `program-slot`"
-                    + " WHERE DateOfProgram between '" + programSlotStarts + "' and '" + programSlotEnds + "' "
-                    + " OR ADDTIME(DateOfProgram, duration) between '" + programSlotStarts + "' and '" + programSlotEnds + "' "
-                    + " OR (DateOfProgram < '" + programSlotStarts + "' AND ADDTIME(DateOfProgram, duration) > '" + programSlotEnds + "')";
-            List<ProgramSlot> searchResults = listQuery(connection.prepareStatement(sql));
-            return !searchResults.isEmpty();
+                    + " WHERE (DateOfProgram between '" + programSlotStarts
+                    + "' and '" + programSlotEnds + "' "
+                    + " OR ADDTIME(DateOfProgram, duration) between '"
+                    + programSlotStarts + "' and '" + programSlotEnds + "' "
+                    + " OR (DateOfProgram < '" + programSlotStarts
+                    + "' AND ADDTIME(DateOfProgram, duration) > '"
+                    + programSlotEnds + "'))";
+            if (origin != null) {
+                sql += " AND DateOfProgram <> '" + origin.getDateOfProgram() + "'";
+            }
+            List<ProgramSlot> result = listQuery(connection.prepareStatement(sql));
+            LOG.log(Level.INFO, "{0} overlap Program Slot found.", result.size());
+            return !result.isEmpty();
         } finally {
             closeConnection();
         }
     }
 
     @Override
-    public void create(ProgramSlot input) throws DuplicateException, SQLException {
+    public void create(ProgramSlot input) throws DuplicateException, InvalidDataException, SQLException {
         String sql = "";
         PreparedStatement preparedStatement = null;
         openConnection();
         try {
-            sql = "INSERT INTO `phoenix`.`program-slot` (`dateOfProgram`, `duration`, `program-name`, `presenter`, `producer`, `assignedBy`) VALUES (?,?,?,?,?,?);";
+            sql = "INSERT INTO `phoenix`.`program-slot`"
+                    + "(`dateOfProgram`"
+                    + ", `duration`"
+                    + ", `program-name`"
+                    + ", `presenter`"
+                    + ", `producer`"
+                    + ", `assignedBy`)"
+                    + " VALUES (?,?,?,?,?,?);";
             preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setTimestamp(1, Timestamp.valueOf(input.getDateOfProgram()));
+            preparedStatement.setTimestamp(
+                    1,
+                    Timestamp.valueOf(input.getDateOfProgram())
+            );
             preparedStatement.setTime(2, Time.valueOf(input.getDuration()));
             preparedStatement.setString(3, input.getRadioProgram().getName());
             preparedStatement.setString(4, input.getPresenter().getId());
             preparedStatement.setString(5, input.getProducer().getId());
             preparedStatement.setString(6, input.getAssignedBy());
-            int rowcount = databaseExecute(preparedStatement);
-            if (rowcount != 1) {
-                throw new DuplicateException("There is a Program Slot Object already exists on this date of program", null);
-            }
-
+            int rowcount = databaseUpdate(preparedStatement);
+            LOG.log(Level.INFO, "{0} Program Slot was created.", input.getDateOfProgram().toString());
+        } catch (SQLException ex) {
+            ExceptionHelper.throwCreationException(ex, LOG, input.getDateOfProgram().toString() + " Program Slot");
         } finally {
             if (preparedStatement != null) {
                 preparedStatement.close();
             }
             closeConnection();
         }
-
     }
 
     @Override
@@ -107,8 +136,62 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
 
     }
 
+    @Override
+    public List<ProgramSlot> search(ProgramSlot input) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public List<ProgramSlot> search(Integer year) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void update(ProgramSlot input, ProgramSlot origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
+        String sql = "";
+        PreparedStatement preparedStatement = null;
+        openConnection();
+        try {
+            sql = "UPDATE `phoenix`.`program-slot` SET "
+                    + "`dateOfProgram` = ?"
+                    + ", `duration` = ?"
+                    + ", `program-name` = ?"
+                    + ", `presenter` = ?"
+                    + ", `producer` = ?"
+                    + ", `assignedBy` = ?"
+                    + " WHERE dateOfProgram = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setTimestamp(
+                    1,
+                    Timestamp.valueOf(input.getDateOfProgram())
+            );
+            preparedStatement.setTime(2, Time.valueOf(input.getDuration()));
+            preparedStatement.setString(3, input.getRadioProgram().getName());
+            preparedStatement.setString(4, input.getPresenter().getId());
+            preparedStatement.setString(5, input.getProducer().getId());
+            preparedStatement.setString(6, input.getAssignedBy());
+            preparedStatement.setTimestamp(
+                    7,
+                    Timestamp.valueOf(origin.getDateOfProgram())
+            );
+            int rowcount = databaseUpdate(preparedStatement);
+            if (rowcount != 1) {
+                LOG.log(Level.INFO, "{0} Program Slot object not found", origin.getDateOfProgram().toString());
+                throw new NotFoundException("Program Slot object not found.");
+            }
+            LOG.log(Level.INFO, "{0} Program Slot was update.", input.getDateOfProgram().toString());
+        } catch (SQLException ex) {
+            ExceptionHelper.throwUpdationException(ex, LOG, input.getDateOfProgram().toString() + " Program Slot");
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            closeConnection();
+        }
+    }
+
     /**
-     * databaseExecute-method. This method is a helper method for internal use.
+     * databaseUpdate-method. This method is a helper method for internal use.
      * It will execute all database handling that will change the information in
      * tables. SELECT queries will not be executed here however. The return
      * value indicates how many rows were affected. This method will also make
@@ -119,7 +202,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
      * @return
      * @throws java.sql.SQLException
      */
-    protected int databaseExecute(PreparedStatement preparedStatement)
+    protected int databaseUpdate(PreparedStatement preparedStatement)
             throws SQLException {
 
         int result = preparedStatement.executeUpdate();
@@ -158,7 +241,8 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
                 );
 
             } else {
-                throw new NotFoundException("Program Slot Object Not Found!");
+                LOG.log(Level.INFO, "{0} Program Slot object not found", programSlot.getDateOfProgram().toString());
+                throw new NotFoundException("Program Slot object not found.");
             }
         } finally {
             if (result != null) {
@@ -221,15 +305,4 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
 
         return (List<ProgramSlot>) searchResults;
     }
-
-    @Override
-    public List<ProgramSlot> search(ProgramSlot input) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void update(ProgramSlot input) throws NotFoundException, SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 }

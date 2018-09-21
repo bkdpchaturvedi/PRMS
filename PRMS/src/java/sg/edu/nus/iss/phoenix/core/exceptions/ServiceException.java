@@ -19,8 +19,11 @@ public class ServiceException extends RuntimeException {
     /**
      * Constructor for ServiceException. The input message is returned in
      * toString() message.
+     * @param message
+     * @param cause
      */
     public ServiceException(String message, Throwable cause) {
         super(message, cause);
     }
+    
 }

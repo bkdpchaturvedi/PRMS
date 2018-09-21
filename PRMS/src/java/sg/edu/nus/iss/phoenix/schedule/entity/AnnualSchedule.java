@@ -6,11 +6,12 @@
 package sg.edu.nus.iss.phoenix.schedule.entity;
 
 import java.io.Serializable;
+import java.time.LocalTime;
 
 /**
  * AnnualSchedule Value Object. This class is value object representing database
- * table annual-schedule. This class is intented to be used together with 
- * associated Dao object.
+ * table annual-schedule. This class is intended to be used together with 
+ * associated DAO object.
  * @author MyatMin
  */
 public class AnnualSchedule implements Serializable, Cloneable {
@@ -29,6 +30,10 @@ public class AnnualSchedule implements Serializable, Cloneable {
      * argument, which is the primary key and data of the corresponding table.
      */
     public AnnualSchedule() {
+    }
+    
+    public AnnualSchedule(Integer year) {
+        this.year = year;
     }
 
     public AnnualSchedule(Integer year, String assignedBy) {
@@ -58,6 +63,19 @@ public class AnnualSchedule implements Serializable, Cloneable {
         this.assignedBy = assignedBy;
     }
     
+    /**
+     * appointAll allows to set all persistent variables in one method call. This is
+     * useful, when all data is available and it is needed to set the initial
+     * state of this object. Note that this method will directly modify instance
+     * variables, without going trough the individual set-methods.
+     *
+     * @param year
+     * @param assignedBy
+     */
+    public void appointAll(Integer year, String assignedBy) {
+        this.year = year;
+        this.assignedBy  = assignedBy;
+    }
     /** 
      * hasEqualMapping-method will compare two RadioProgram instances
      * and return true if they contain same values in all persistent instance 
