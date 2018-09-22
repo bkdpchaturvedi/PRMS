@@ -31,6 +31,10 @@ public class WeeklySchedule implements Serializable, Cloneable {
      */
     public WeeklySchedule() {
     }
+    
+    public WeeklySchedule(LocalDate startDate) {
+        this.startDate = startDate;
+    }
 
     public WeeklySchedule(LocalDate startDate, String assignedBy) {
         this.startDate = startDate;

@@ -59,6 +59,30 @@ public class AnnualScheduleDAOImpl extends DBConnector implements AnnualSchedule
     }
 
     @Override
+    public void delete(AnnualSchedule input) throws NotFoundException, SQLException {
+        String sql = "";
+        PreparedStatement preparedStatement = null;
+        openConnection();
+        try {
+            sql = "DELETE FROM `phoenix`.`annual-schedule` "
+                    + "WHERE year = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, input.getYear());
+            int rowcount = databaseUpdate(preparedStatement);
+            if (rowcount == 0) {
+                LOG.log(Level.INFO, "{0} Annual Schedule object not found", input.getYear().toString());
+                throw new NotFoundException("Annual Schedule object not found.");
+            }
+            LOG.log(Level.INFO, "{0} Annual Schedule was deleted", input.getYear());
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            closeConnection();
+        }
+    }
+    
+    @Override
     public AnnualSchedule get(Integer year) throws SQLException, NotFoundException {
         AnnualSchedule annualSchedule = createValueObject();
         annualSchedule.setYear(year);

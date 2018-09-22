@@ -20,6 +20,13 @@ import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
  */
 public interface ProgramSlotDAO {
 
+    static enum DateRangeFilter {
+        BY_YEAR,
+        BY_WEEK,
+        BY_DATE,
+        BY_HOUR
+    }
+
     /**
      * createValueObject-method. This method is used when the Dao class needs to
      * create new value object instance. The reason why this method exists is
@@ -29,6 +36,19 @@ public interface ProgramSlotDAO {
      * @return the program slot class instance
      */
     public abstract ProgramSlot createValueObject();
+
+    /**
+     * checkExisitCount-method. This will check the record counts of existing
+     * data from table using given data from input object contents and Date
+     * range filter type.
+     *
+     * @param input the program slot class instance
+     * @param filter
+     * @return boolean
+     * @throws java.sql.SQLException
+     */
+    public abstract Integer checkExisitCount(LocalDateTime input, 
+            DateRangeFilter filter) throws SQLException;
 
     /**
      * checkOverlap-method. This will check with the existing data from table
@@ -87,7 +107,7 @@ public interface ProgramSlotDAO {
      * @throws java.sql.SQLException
      */
     public abstract void delete(ProgramSlot input)
-            throws NotFoundException, SQLException;
+            throws NotFoundException, InUseException, SQLException;
 
     /**
      * get-method. This will create and load valueObject contents from database
@@ -145,27 +165,27 @@ public interface ProgramSlotDAO {
      *
      * @param input This parameter contains the class instance where search will
      * be based. Primary-key field should not be set.
+     * @param filter
      * @return list of the class instance
      * @throws java.sql.SQLException
      */
     public abstract List<ProgramSlot> search(ProgramSlot input)
             throws SQLException;
-    
-    /**
-     * search-Method. This method provides searching capability to get matching
-     * valueObjects from database. It works by searching all objects that match
-     * permanent instance variables of given object. The
-     * result will be 0-N objects in a List, all matching those criteria you
-     * specified. Those instance-variables that have NULL values are excluded in
-     * search-criteria.
-     *
-     * @param year
-     * @return list of the class instance
-     * @throws java.sql.SQLException
-     */
-    public abstract List<ProgramSlot> search(Integer year)
-            throws SQLException;
 
+//    /**
+//     * search-Method. This method provides searching capability to get matching
+//     * valueObjects from database. It works by searching all objects that match
+//     * permanent instance variables of given object. The
+//     * result will be 0-N objects in a List, all matching those criteria you
+//     * specified. Those instance-variables that have NULL values are excluded in
+//     * search-criteria.
+//     *
+//     * @param year
+//     * @return list of the class instance
+//     * @throws java.sql.SQLException
+//     */
+//    public abstract List<ProgramSlot> search(Integer year)
+//            throws SQLException;
     /**
      * update-method. This method will save the current state of input to
      * database. Save can not be used to create new instances in database, so

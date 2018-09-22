@@ -61,6 +61,30 @@ public class WeeklyScheduleDAOImpl extends DBConnector implements WeeklySchedule
     }
 
     @Override
+    public void delete(WeeklySchedule input) throws NotFoundException, SQLException {
+        String sql = "";
+        PreparedStatement preparedStatement = null;
+        openConnection();
+        try {
+            sql = "DELETE FROM `phoenix`.`weekly-schedule` "
+                    + "WHERE StartDate = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setDate(1, Date.valueOf(input.getSartDate()));
+            int rowcount = databaseUpdate(preparedStatement);
+            if (rowcount == 0) {
+                LOG.log(Level.INFO, "{0} Weekly Schedule object not found", input.getSartDate().toString());
+                throw new NotFoundException("Weekly Schedule object not found.");
+            }
+            LOG.log(Level.INFO, "{0} Weekly Schedule was deleted", input.getSartDate());
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            closeConnection();
+        }
+    }
+    
+    @Override
     public WeeklySchedule get(LocalDate startDate) throws SQLException, NotFoundException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

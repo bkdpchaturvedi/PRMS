@@ -46,6 +46,23 @@ public interface AnnualScheduleDAO {
             throws SQLException, DuplicateException, InvalidDataException;
 
     /**
+     * delete-method. This method will remove the information from database as
+     * identified by by primary-key in supplied valueObject. Once valueObject
+     * has been deleted it can not be restored by calling save. Restoring can
+     * only be done using create method but if database is using automatic
+     * surrogate-keys, the resulting object will have different primary-key than
+     * what it was in the deleted object. If delete can not find matching row,
+     * NotFoundException will be thrown.
+     *
+     * @param input This parameter contains the class instance to be deleted.
+     * Primary-key field must be set for this to work properly.
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
+     * @throws java.sql.SQLException
+     */
+    public abstract void delete(AnnualSchedule input)
+            throws NotFoundException, SQLException;
+    
+    /**
      * get-method. This will create and load valueObject contents from database
      * using given Primary-Key as identifier. This method is just a convenience
      * method for the real load-method which accepts the valueObject as a

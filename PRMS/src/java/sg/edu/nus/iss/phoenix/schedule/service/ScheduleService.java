@@ -7,7 +7,6 @@ package sg.edu.nus.iss.phoenix.schedule.service;
 
 import java.sql.SQLException;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
@@ -21,10 +20,12 @@ import sg.edu.nus.iss.phoenix.core.exceptions.InUseException;
 import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 import sg.edu.nus.iss.phoenix.core.exceptions.ServiceException;
+import sg.edu.nus.iss.phoenix.schedule.dao.ProgramSlotDAO;
 import sg.edu.nus.iss.phoenix.schedule.entity.AnnualSchedule;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 import sg.edu.nus.iss.phoenix.schedule.entity.WeeklySchedule;
 import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
+import sg.edu.nus.iss.phoenix.utilities.DateHelper;
 
 /**
  *
@@ -64,9 +65,14 @@ public class ScheduleService {
      * @param input
      * @throws SQLException
      */
-    public void deleteProgramSlot(ProgramSlot input) throws SQLException {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+    public void deleteProgramSlot(ProgramSlot input) throws NotFoundException, InUseException {
+         try {
+            DAOFactory.getProgramSlotDAO().delete(input);
+            depopulateSchedule(input);
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, null, e);
+            throw new ServiceException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -138,21 +144,14 @@ public class ScheduleService {
             try {
                 DAOFactory.getAnnualScheduleDAO().create(
                         new AnnualSchedule(
-                                input.getDateOfProgram().get(WeekFields.ISO.weekBasedYear()), 
+                                DateHelper.getWeekYear(input.getDateOfProgram().toLocalDate()),
                                 input.getAssignedBy()
                         )
                 );
                 for (int i = 1; i <= 52; i++) {
-                    LocalDate startDate = LocalDate.ofYearDay(
-                            input.getDateOfProgram().get(WeekFields.ISO.weekBasedYear()), i
-                    ).with(
-                            WeekFields.ISO.weekOfYear(), i
-                    ).with(
-                            TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
-                    );
                     DAOFactory.getWeeklyScheduleDAO().create(
                             new WeeklySchedule(
-                                    startDate,
+                                    DateHelper.getWeekStartDate(input.getDateOfProgram().toLocalDate(), i),
                                     input.getAssignedBy()
                             )
                     );
@@ -174,17 +173,34 @@ public class ScheduleService {
      * @param input
      * @throws SQLException
      */
-    private void depopulateSchedule(ProgramSlot input) throws DuplicateException, InvalidDataException {
+    private void depopulateSchedule(ProgramSlot input) {
         try {
-            DAOFactory.getProgramSlotDAO().search(
-                    input.getDateOfProgram().get(WeekFields.ISO.weekBasedYear())
-            );
+            Integer count = DAOFactory.getProgramSlotDAO().checkExisitCount(input.getDateOfProgram(), ProgramSlotDAO.DateRangeFilter.BY_YEAR);
+            if (count == 0) {
+                for (int i = 1; i <= 52; i++) {
+                    try {
+                        DAOFactory.getWeeklyScheduleDAO().delete(
+                                new WeeklySchedule(
+                                        DateHelper.getWeekStartDate(input.getDateOfProgram().toLocalDate(), i)
+                                )
+                        );
+                    } catch (NotFoundException e) {
+                        LOG.log(Level.INFO, e.getMessage());
+                    }
+                }
+                
+                try {
+                    DAOFactory.getAnnualScheduleDAO().delete(new AnnualSchedule(DateHelper.getWeekYear(input.getDateOfProgram().toLocalDate())));
+                } catch (NotFoundException e) {
+                    LOG.log(Level.INFO, e.getMessage());
+                }
+            }
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, null, e);
             throw new ServiceException(e.getMessage(), e);
         }
     }
-    
+
     /**
      * Updates representation of an instance of resource to persistent data
      * table
@@ -208,6 +224,5 @@ public class ScheduleService {
             throw new ServiceException(e.getMessage(), e);
         }
     }
-    
 
 }
