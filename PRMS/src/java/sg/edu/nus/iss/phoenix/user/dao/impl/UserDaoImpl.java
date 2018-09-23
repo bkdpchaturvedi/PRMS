@@ -339,9 +339,9 @@ public class UserDaoImpl implements UserDao {
 	@Override
 	public List<User> getUsersByRole(Role role) throws SQLException {
 		List<User> searchResults;
-		StringBuffer sql = new StringBuffer("SELECT * FROM user WHERE ROLE like %");
+		StringBuffer sql = new StringBuffer("SELECT * FROM user WHERE ROLE like '%");
 		sql.append(role.getRole());
-		sql.append("%");
+		sql.append("%'");
 		searchResults = listQuery(this.connection.prepareStatement(sql
 				.toString()));
 		return searchResults;
