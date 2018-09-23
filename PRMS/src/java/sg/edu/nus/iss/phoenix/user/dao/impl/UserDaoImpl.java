@@ -276,58 +276,58 @@ public class UserDaoImpl implements UserDao {
 		return (null);
 	}
 
-//	@Override
-//	public List<User> searchMatching(User valueObject) throws SQLException {
-//
-//		List<User> searchResults;
-//
-//		boolean first = true;
-//		StringBuffer sql = new StringBuffer("SELECT * FROM user WHERE 1=1 ");
-//
-//		if (valueObject.getId() != "") {
-//			if (first) {
-//				first = false;
-//			}
-//			sql.append("AND id = '").append(valueObject.getId()).append("' ");
-//		}
-//
-//		if (valueObject.getPassword() != null) {
-//			if (first) {
-//				first = false;
-//			}
-//			sql.append("AND password = '").append(valueObject.getPassword())
-//					.append("' ");
-//		}
-//
-//		if (valueObject.getName() != null) {
-//			if (first) {
-//				first = false;
-//			}
-//			sql.append("AND name LIKE '").append(valueObject.getName())
-//					.append("%' ");
-//		}
-//
-//		if (valueObject.getRoles().size() > 0 && valueObject.getRoles().get(0).getRole() != null) {
-//			if (first) {
-//				first = false;
-//			}
-//			sql.append("AND role LIKE '")
-//					.append(valueObject.getRoles().get(0).getRole())
-//					.append("%' ");
-//		}
-//
-//		sql.append("ORDER BY id ASC ");
-//
-//		// Prevent accidential full table results.
-//		// Use loadAll if all rows must be returned.
-//		if (first)
-//			searchResults = new ArrayList<User>();
-//		else
-//			searchResults = listQuery(this.connection.prepareStatement(sql
-//					.toString()));
-//
-//		return searchResults;
-//	}
+	@Override
+	public List<User> searchMatching(User valueObject) throws SQLException {
+
+		List<User> searchResults;
+
+		boolean first = true;
+		StringBuffer sql = new StringBuffer("SELECT * FROM user WHERE 1=1 ");
+
+		if (valueObject.getId() != "") {
+			if (first) {
+				first = false;
+			}
+			sql.append("AND id = '").append(valueObject.getId()).append("' ");
+		}
+
+		if (valueObject.getPassword() != null) {
+			if (first) {
+				first = false;
+			}
+			sql.append("AND password = '").append(valueObject.getPassword())
+					.append("' ");
+		}
+
+		if (valueObject.getName() != null) {
+			if (first) {
+				first = false;
+			}
+			sql.append("AND name LIKE '").append(valueObject.getName())
+					.append("%' ");
+		}
+
+		if (valueObject.getRoles().size() > 0 && valueObject.getRoles().get(0).getRole() != null) {
+			if (first) {
+				first = false;
+			}
+			sql.append("AND role LIKE '")
+					.append(valueObject.getRoles().get(0).getRole())
+					.append("%' ");
+		}
+
+		sql.append("ORDER BY id ASC ");
+
+		// Prevent accidential full table results.
+		// Use loadAll if all rows must be returned.
+		if (first)
+			searchResults = new ArrayList<User>();
+		else
+			searchResults = listQuery(this.connection.prepareStatement(sql
+					.toString()));
+
+		return searchResults;
+	}
 
 	/**
 	 * getUsersByRole-method . This method will take a Role as an input parammeter
