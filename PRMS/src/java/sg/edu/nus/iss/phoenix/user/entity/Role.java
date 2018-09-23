@@ -63,14 +63,14 @@ public class Role implements Cloneable, Serializable {
 	 * useful, when all data is available and it is needed to set the initial
 	 * state of this object. Note that this method will directly modify instance
 	 * variales, without going trough the individual set-methods.
-     * @param roleIn
-     * @param accessPrivilegeIn
-	 */
+         * @param roleIn
+         * @param accessPrivilegeIn
+	 
 
 	public void setAll(String roleIn, String accessPrivilegeIn) {
 		this.role = roleIn;
 		this.accessPrivilege = accessPrivilegeIn;
-	}
+	}*/
 
 	/**
 	 * hasEqualMapping-method will compare two Role instances and return true if
