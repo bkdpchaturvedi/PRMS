@@ -338,10 +338,10 @@ public class UserDaoImpl implements UserDao {
 	public List<User> getUsersByRole(Role role) throws SQLException {
 		List<User> searchResults;
 		StringBuffer sql = new StringBuffer("SELECT * FROM user WHERE ROLE = ");
-		sql.append(role.getRole())
+		sql.append(role.getRole());
 		searchResults = listQuery(this.connection.prepareStatement(sql
 				.toString()));
-		return searchResults();
+		return searchResults;
 	}
 
 	/**
