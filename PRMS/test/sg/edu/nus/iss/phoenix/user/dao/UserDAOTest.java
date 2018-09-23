@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package sg.edu.nus.iss.phoenix.user.service;
+package sg.edu.nus.iss.phoenix.user.dao;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -18,7 +19,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runners.MethodSorters;
 import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
 import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
-import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
+import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
+import sg.edu.nus.iss.phoenix.user.dao.impl.UserDaoImpl;
 import sg.edu.nus.iss.phoenix.user.entity.Role;
 import sg.edu.nus.iss.phoenix.user.entity.User;
 
@@ -27,13 +29,13 @@ import sg.edu.nus.iss.phoenix.user.entity.User;
  * @author MyatMin
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class UserServiceTest {
+public class UserDAOTest {
 
     private User toCreate;
     private User toUpdate;
-    private static UserService service;
+    private static UserDao userDAO;
 
-    public UserServiceTest() {
+    public UserDAOTest() {
 
     }
     @Rule
@@ -41,19 +43,19 @@ public class UserServiceTest {
 
     @BeforeClass
     public static void setUpClass() {
-        service = new UserService();
+        userDAO = new UserDaoImpl();
     }
 
     @AfterClass
     public static void tearDownClass() {
-        service = null;
+        userDAO = null;
     }
 
     @Before
     public void setUp() {
         toCreate = new User();
         toUpdate = new User();
-        toUpdate.appointAll("test02", "password", "test02", "presenter");
+        toUpdate.appointAll("testuser2", "Password", "testuser2", "presenter");
     }
 
     @After
@@ -63,16 +65,16 @@ public class UserServiceTest {
     }
 
     @Test
-    public void test01_createUser_withNotExistedKeys_shouldCreate() throws OverlapException, DuplicateException, InvalidDataException {
+    public void test01_createUser_withNotExistedKeys_shouldCreate() throws DuplicateException, InvalidDataException, SQLException {
         thrown.expect(InvalidDataException.class);
-        toCreate.appointAll("test01", "password", "test01", "presenter");
-        service.createUser(toCreate);
+        toCreate.appointAll("testuser1", "Password", "testuser1", "presenter");
+        userDAO.create(toCreate);
     }
 
     @Test
-    public void test02_createUser_withNullKeys_shouldThrowInvalidData() throws OverlapException, DuplicateException, InvalidDataException {
+    public void test02_createUser_withNullKeys_shouldThrowInvalidData() throws DuplicateException, InvalidDataException, SQLException {
         thrown.expect(InvalidDataException.class);
-        service.createUser(toCreate);
+        userDAO.create(toCreate);
     }
 
     @Test
@@ -81,23 +83,26 @@ public class UserServiceTest {
             ArrayList<Role> roles = new ArrayList<Role>(){};
             roles.add(new Role("presenter"));
             toUpdate.setRoles(roles);
-            service.updateUser(toUpdate);
+            userDAO.create(toUpdate);
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
 
     @Test
-    public void test04_updateUser_withNewName_shouldUpdate() throws OverlapException, DuplicateException, InvalidDataException {
-        thrown.expect(OverlapException.class);
-        toUpdate.setName("test04");
-        service.updateUser(toUpdate);
+    public void test04_updateUser_withNewName_shouldUpdate() {
+        try {
+            toUpdate.setName("test04");
+            userDAO.create(toUpdate);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
     }
 
     @Test
-    public void test05_updateUser_withNewPassword_shouldUpdate() throws OverlapException, DuplicateException, InvalidDataException {
-        thrown.expect(OverlapException.class);
+    public void test05_updateUser_withNewPassword_shouldUpdate() throws SQLException, NotFoundException {
+        thrown.expect(NotFoundException.class);
         toUpdate.setPassword("password2");
-        service.updateUser(toUpdate);
+        userDAO.save(toUpdate);
     }
 }

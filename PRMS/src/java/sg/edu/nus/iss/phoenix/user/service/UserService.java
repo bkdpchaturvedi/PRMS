@@ -232,4 +232,21 @@ public class UserService {
         return usr;
         
     }
+    
+     /**
+     * Get all user roles in the system.
+     *
+     * @return  list of all user roles 
+   */
+    public List<Role> getAllRoles() {
+        ArrayList<Role> roleList = new ArrayList<Role>();
+        try {
+            roleList = (ArrayList<Role>) DAOFactory.getRoleDAO()
+                    .loadAll();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return roleList;
+    }
 }
