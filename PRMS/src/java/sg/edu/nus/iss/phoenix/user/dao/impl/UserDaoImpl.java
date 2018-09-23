@@ -36,23 +36,21 @@ public class UserDaoImpl implements UserDao {
 		connection = openConnection();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * sg.edu.nus.iss.phoenix.authenticate.dao.impl.UserDao#createValueObject()
+	/**
+	 *  createValueObject-Method: create a User object
+	 * @return
 	 */
 	@Override
 	public User createValueObject() {
 		return new User();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * sg.edu.nus.iss.phoenix.authenticate.dao.impl.UserDao#getObject(java.sql
-	 * .Connection, int)
+	/**
+	 *  getObject-Method: get a User by the user id
+	 * @param id
+	 * @return
+	 * @throws NotFoundException
+	 * @throws SQLException
 	 */
 	@Override
 	public User getObject(String id) throws NotFoundException, SQLException {
@@ -63,12 +61,13 @@ public class UserDaoImpl implements UserDao {
 		return valueObject;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * sg.edu.nus.iss.phoenix.authenticate.dao.impl.UserDao#load(java.sql.Connection
-	 * , sg.edu.nus.iss.phoenix.authenticate.entity.User)
+	/**
+	 * the detail implementation of the getObject() method
+	 * @param valueObject
+	 *            This parameter contains the class instance to be loaded.
+	 *            Primary-key field must be set for this to work properly.
+	 * @throws NotFoundException
+	 * @throws SQLException
 	 */
 	@Override
 	public void load(User valueObject) throws NotFoundException, SQLException {
@@ -88,12 +87,10 @@ public class UserDaoImpl implements UserDao {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * sg.edu.nus.iss.phoenix.authenticate.dao.impl.UserDao#loadAll(java.sql
-	 * .Connection)
+	/**
+	 * loadAll method: load all the users in DB ordered by id ascending
+ 	 * @return
+	 * @throws SQLException
 	 */
 	@Override
 	public List<User> loadAll() throws SQLException {
@@ -105,12 +102,13 @@ public class UserDaoImpl implements UserDao {
 		return searchResults;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * sg.edu.nus.iss.phoenix.authenticate.dao.impl.UserDao#create(java.sql.
-	 * Connection, sg.edu.nus.iss.phoenix.authenticate.entity.User)
+	/**
+	 * create method: create a new User
+	 * @param valueObject
+	 *            This parameter contains the class instance to be created. If
+	 *            automatic surrogate-keys are not used the Primary-key field
+	 *            must be set for this to work properly.
+	 * @throws SQLException
 	 */
 	@Override
 	public synchronized void create(User valueObject) throws SQLException {
@@ -140,12 +138,13 @@ public class UserDaoImpl implements UserDao {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * sg.edu.nus.iss.phoenix.authenticate.dao.impl.UserDao#save(java.sql.Connection
-	 * , sg.edu.nus.iss.phoenix.authenticate.entity.User)
+	/**
+	 * save method: save the User object to DB
+	 * @param valueObject
+	 *            This parameter contains the class instance to be saved.
+	 *            Primary-key field must be set for this to work properly.
+	 * @throws NotFoundException
+	 * @throws SQLException
 	 */
 	@Override
 	public void save(User valueObject) throws NotFoundException, SQLException {
@@ -178,12 +177,13 @@ public class UserDaoImpl implements UserDao {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * sg.edu.nus.iss.phoenix.authenticate.dao.impl.UserDao#delete(java.sql.
-	 * Connection, sg.edu.nus.iss.phoenix.authenticate.entity.User)
+	/**
+	 * delete method, will take a User as input parameter and remove it from DB based on its id
+	 * @param valueObject
+	 *            This parameter contains the class instance to be deleted.
+	 *            Primary-key field must be set for this to work properly.
+	 * @throws NotFoundException
+	 * @throws SQLException
 	 */
 	@Override
 	public void delete(User valueObject) throws NotFoundException, SQLException {
@@ -212,12 +212,9 @@ public class UserDaoImpl implements UserDao {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * sg.edu.nus.iss.phoenix.authenticate.dao.impl.UserDao#deleteAll(java.sql
-	 * .Connection)
+	/**
+	 * deleteAll method: remove all users in the DB
+	 * @throws SQLException
 	 */
 	@Override
 	public void deleteAll() throws SQLException {
@@ -235,12 +232,10 @@ public class UserDaoImpl implements UserDao {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * sg.edu.nus.iss.phoenix.authenticate.dao.impl.UserDao#countAll(java.sql
-	 * .Connection)
+	/**
+	 * countAll method: count how many users are there in the DB currently, return an int
+	 * @return
+	 * @throws SQLException
 	 */
 	@Override
 	public int countAll() throws SQLException {
@@ -265,6 +260,12 @@ public class UserDaoImpl implements UserDao {
 		return allRows;
 	}
 
+	/**
+	 * searchMatching method: search a specific user based on the user's id
+	 * @param uid
+	 * @return
+	 * @throws SQLException
+	 */
 	@Override
 	public User searchMatching(String uid) throws SQLException {
 		try {
@@ -274,65 +275,59 @@ public class UserDaoImpl implements UserDao {
 		}
 		return (null);
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * sg.edu.nus.iss.phoenix.authenticate.dao.impl.UserDao#searchMatching(java
-	 * .sql.Connection, sg.edu.nus.iss.phoenix.authenticate.entity.User)
-	 */
-	@Override
-	public List<User> searchMatching(User valueObject) throws SQLException {
 
-		List<User> searchResults;
-
-		boolean first = true;
-		StringBuffer sql = new StringBuffer("SELECT * FROM user WHERE 1=1 ");
-
-		if (valueObject.getId() != "") {
-			if (first) {
-				first = false;
-			}
-			sql.append("AND id = '").append(valueObject.getId()).append("' ");
-		}
-
-		if (valueObject.getPassword() != null) {
-			if (first) {
-				first = false;
-			}
-			sql.append("AND password = '").append(valueObject.getPassword())
-					.append("' ");
-		}
-
-		if (valueObject.getName() != null) {
-			if (first) {
-				first = false;
-			}
-			sql.append("AND name LIKE '").append(valueObject.getName())
-					.append("%' ");
-		}
-
-		if (valueObject.getRoles().size() > 0 && valueObject.getRoles().get(0).getRole() != null) {
-			if (first) {
-				first = false;
-			}
-			sql.append("AND role LIKE '")
-					.append(valueObject.getRoles().get(0).getRole())
-					.append("%' ");
-		}
-
-		sql.append("ORDER BY id ASC ");
-
-		// Prevent accidential full table results.
-		// Use loadAll if all rows must be returned.
-		if (first)
-			searchResults = new ArrayList<User>();
-		else
-			searchResults = listQuery(this.connection.prepareStatement(sql
-					.toString()));
-
-		return searchResults;
-	}
+//	@Override
+//	public List<User> searchMatching(User valueObject) throws SQLException {
+//
+//		List<User> searchResults;
+//
+//		boolean first = true;
+//		StringBuffer sql = new StringBuffer("SELECT * FROM user WHERE 1=1 ");
+//
+//		if (valueObject.getId() != "") {
+//			if (first) {
+//				first = false;
+//			}
+//			sql.append("AND id = '").append(valueObject.getId()).append("' ");
+//		}
+//
+//		if (valueObject.getPassword() != null) {
+//			if (first) {
+//				first = false;
+//			}
+//			sql.append("AND password = '").append(valueObject.getPassword())
+//					.append("' ");
+//		}
+//
+//		if (valueObject.getName() != null) {
+//			if (first) {
+//				first = false;
+//			}
+//			sql.append("AND name LIKE '").append(valueObject.getName())
+//					.append("%' ");
+//		}
+//
+//		if (valueObject.getRoles().size() > 0 && valueObject.getRoles().get(0).getRole() != null) {
+//			if (first) {
+//				first = false;
+//			}
+//			sql.append("AND role LIKE '")
+//					.append(valueObject.getRoles().get(0).getRole())
+//					.append("%' ");
+//		}
+//
+//		sql.append("ORDER BY id ASC ");
+//
+//		// Prevent accidential full table results.
+//		// Use loadAll if all rows must be returned.
+//		if (first)
+//			searchResults = new ArrayList<User>();
+//		else
+//			searchResults = listQuery(this.connection.prepareStatement(sql
+//					.toString()));
+//
+//		return searchResults;
+//	}
 
 	/**
 	 * getUsersByRole-method . This method will take a Role as an input parammeter
@@ -448,6 +443,11 @@ public class UserDaoImpl implements UserDao {
 		return (List<User>) searchResults;
 	}
 
+	/**
+	 *  createdRoles method: create a list of Role object with the input roles string
+	 * @param roles
+	 * @return
+	 */
 	private ArrayList<Role> createRoles(final String roles) {
 		ArrayList<Role> roleList = new ArrayList<>();
 		String[] _r = roles.trim().split(DELIMITER);
@@ -456,6 +456,10 @@ public class UserDaoImpl implements UserDao {
 		return (roleList);
 	}
 
+	/**
+	 * openConnection method: open connection to the DB
+	 * @return
+	 */
 	private Connection openConnection() {
 		Connection conn = null;
 		try {
