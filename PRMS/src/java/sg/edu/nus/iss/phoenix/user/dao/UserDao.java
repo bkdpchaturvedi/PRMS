@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import sg.edu.nus.iss.phoenix.user.entity.User;
+import sg.edu.nus.iss.phoenix.user.entity.Role;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 
 public interface UserDao {
@@ -160,5 +161,8 @@ public interface UserDao {
 			throws SQLException;
 
 	public abstract User searchMatching(String uid)
+			throws SQLException;
+
+	public abstract List<User> getUsersByRole(Role role)
 			throws SQLException;
 }

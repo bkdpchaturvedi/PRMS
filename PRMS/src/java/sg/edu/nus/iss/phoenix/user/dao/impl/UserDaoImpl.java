@@ -27,6 +27,7 @@ public class UserDaoImpl implements UserDao {
 	private static final Logger logger = Logger.getLogger(UserDaoImpl.class.getName());
 
 	Connection connection;
+	private Role role;
 
 
 	public UserDaoImpl() {
@@ -331,6 +332,16 @@ public class UserDaoImpl implements UserDao {
 					.toString()));
 
 		return searchResults;
+	}
+
+	@Override
+	public List<User> getUsersByRole(Role role) throws SQLException {
+		List<User> searchResults;
+		StringBuffer sql = new StringBuffer("SELECT * FROM user WHERE ROLE = ");
+		sql.append(role.getRole())
+		searchResults = listQuery(this.connection.prepareStatement(sql
+				.toString()));
+		return searchResults();
 	}
 
 	/**
