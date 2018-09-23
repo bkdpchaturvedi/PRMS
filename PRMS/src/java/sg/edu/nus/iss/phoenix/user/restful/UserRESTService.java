@@ -18,6 +18,8 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
+
+import sg.edu.nus.iss.phoenix.user.entity.Role;
 import sg.edu.nus.iss.phoenix.user.entity.User;
 import sg.edu.nus.iss.phoenix.core.restful.JSONEnvelop;
 import sg.edu.nus.iss.phoenix.user.service.UserService;
@@ -191,5 +193,29 @@ public class UserRESTService {
         }
 
         return result;
+    }
+
+    /**
+     * Retrieves representation of all instances of resource
+     *
+     * @return an instance of JSONEnvelop of producer array list
+     */
+    @GET
+    @Path("/roles")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JSONEnvelop<List<Role>> getAllRoles() {
+
+        JSONEnvelop<List<Role>> result;
+        result = new JSONEnvelop<>();
+
+        try {
+            result.setData(service.getAllRoles());
+        } catch (Exception ex) {
+            result.setError(new sg.edu.nus.iss.phoenix.core.restful.Error("Error while Retrieving producers ", ex.getMessage()));
+        }
+
+        //TODO return proper representation object
+        return result;
+        // throw new UnsupportedOperationException();
     }
 }
