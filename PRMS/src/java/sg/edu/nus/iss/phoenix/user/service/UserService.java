@@ -7,6 +7,7 @@ package sg.edu.nus.iss.phoenix.user.service;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import java.util.logging.*;
@@ -14,6 +15,8 @@ import sg.edu.nus.iss.phoenix.user.entity.Role;
 import sg.edu.nus.iss.phoenix.user.entity.User;
 import sg.edu.nus.iss.phoenix.core.dao.DAOFactory;
 import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
+import sg.edu.nus.iss.phoenix.schedule.dao.ProgramSlotDAO;
+import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 
 /**
  *
@@ -29,13 +32,13 @@ public class UserService {
 
 
     /**
-     * Compare the list of newly added roles to exiusting roles for a user
+     * Compare the list of newly added roles to existing roles for a user
      *
      * @param currentRoles
      * @param existingRoles
      * @return list of roles to be removed
      */
-    public List<Role> compare(List<Role> currentRoles, List<Role> existingRoles) {
+    private List<Role> compare(List<Role> currentRoles, List<Role> existingRoles) {
         
         List<Role> listNew = new ArrayList<Role>(currentRoles);
         List<Role> listExist = new ArrayList<Role>(existingRoles);
@@ -76,8 +79,30 @@ public class UserService {
         //throw new UnsupportedOperationException();
 
         try {
+            ArrayList<Role> existingRoles = getUserById(input.getId()).getRoles();
+            ArrayList<Role> currentRoles = input.getRoles();
+            
+            List<Role> deletedRoles = compare(currentRoles, existingRoles);
+            //Iterator<Role> iter = deletedRoles.iterator();
+            boolean pp = deletedRoles.contains(new Role("producer"))
+                    || deletedRoles.contains(new Role("presenter"));
+            
+            if (pp)
+            {
+                ProgramSlot ps = new ProgramSlot();
+                ps.setPresenter(input);
+                ps.setProducer(input);
+                if (DAOFactory.getProgramSlotDAO().checkExistCount(ps, ProgramSlotDAO.DateRangeFilter.BY_FUTURE, ProgramSlotDAO.FieldsOpreation.OR) > 0)
+                {
+                    return false;
+                }
+                //to implement after MM changes
+            }
+            
             DAOFactory.getUserDAO().save(input);
             return true;
+     
+           
         }
         catch (Exception e)
         {
@@ -100,6 +125,22 @@ public class UserService {
         //throw new UnsupportedOperationException();
         try {
             User delUser = new User(id);
+            List<Role> usrRoles = delUser.getRoles();
+            //Iterator<Role> iter = deletedRoles.iterator();
+            boolean pp = usrRoles.contains(new Role("producer"))
+                    || usrRoles.contains(new Role("presenter"));
+            
+            if (pp)
+            {
+                ProgramSlot ps = new ProgramSlot();
+                ps.setPresenter(delUser);
+                ps.setProducer(delUser);
+                if (DAOFactory.getProgramSlotDAO().checkExistCount(ps, ProgramSlotDAO.DateRangeFilter.BY_FUTURE, ProgramSlotDAO.FieldsOpreation.OR) > 0)
+                {
+                    return false;
+                }
+            }
+           
             DAOFactory.getUserDAO().delete(delUser);
             return true;
         }
