@@ -5,14 +5,9 @@
  */
 package sg.edu.nus.iss.phoenix.schedule.restful;
 
-import java.sql.Date;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
@@ -30,6 +25,8 @@ import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 import sg.edu.nus.iss.phoenix.schedule.service.ScheduleService;
 import sg.edu.nus.iss.phoenix.core.restful.JSONEnvelop;
 import sg.edu.nus.iss.phoenix.core.restful.Error;
+import sg.edu.nus.iss.phoenix.utilities.DateHelper;
+import sg.edu.nus.iss.phoenix.utilities.ErrorHelper;
 
 /**
  * REST Web Service
@@ -42,8 +39,9 @@ public class ScheduleRESTService {
 
     @Context
     private UriInfo context;
-
     private ScheduleService service;
+    private static final Logger LOG = Logger.getLogger(ScheduleRESTService.class.getName());
+    
 
     /**
      * Creates a new instance of ScheduleRESTService
@@ -64,8 +62,15 @@ public class ScheduleRESTService {
     public JSONEnvelop<ProgramSlot> getProgramSlot(
             @PathParam("dateOfProgram") String dateOfProgram
     ) {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+        JSONEnvelop<ProgramSlot> result = new JSONEnvelop<>();
+        try {;
+            result.setData(
+                    service.getProgramSlot(DateHelper.getUTC(dateOfProgram))
+            );
+        } catch (Exception e) {
+            result.setError(ErrorHelper.createError(e));
+        }
+        return result;
     }
 
     /**
@@ -77,20 +82,14 @@ public class ScheduleRESTService {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public JSONEnvelop<List<ProgramSlot>> getAllProgramSlots() {
-
         JSONEnvelop<List<ProgramSlot>> result;
         result = new JSONEnvelop<>();
-
         try {
             result.setData(service.getAllProgramSlots());
-        } catch (Exception ex) {
-
-            result.setError(new Error("Error while Retrieving program slots ", ex.getMessage()));
+        } catch (Exception e) {
+            result.setError(ErrorHelper.createError(e));
         }
-
-        //TODO return proper representation object
         return result;
-        // throw new UnsupportedOperationException();
     }
 
     /**
@@ -102,27 +101,41 @@ public class ScheduleRESTService {
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
     public JSONEnvelop<Boolean> creaeProgramSlot(ProgramSlot input) {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+        JSONEnvelop<Boolean> result = new JSONEnvelop<>();
+        try {
+            service.createProgramSlot(input);
+            result.setData(true);
+        } catch (Exception e) {
+            result.setError(ErrorHelper.createError(e));
+        }
+        return result;
     }
 
     /**
      * PUT method for updating or creating an instance of resource
      *
-     * @param content representation for the resource
+     * @param input
+     * @return
      */
     @PUT
-    @Path("/update")
+    @Path("/{dateOfProgram}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public JSONEnvelop<Boolean> updateRadioProgram(ProgramSlot input) {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+    public JSONEnvelop<Boolean> updateRadioProgram(@PathParam("dateOfProgram") String dateOfProgram, ProgramSlot input) {
+        JSONEnvelop<Boolean> result = new JSONEnvelop<>();
+        try {
+            service.updateProgramSlot(input, DateHelper.getUTC(dateOfProgram));
+            result.setData(true);
+        } catch (Exception e) {
+            result.setError(ErrorHelper.createError(e));
+        }
+        return result;
     }
 
     /**
      * DELETE method for deleting an instance of resource
      *
      * @param dateOfProgram date time of the resource
+     * @return 
      */
     @DELETE
     @Path("/delete/{dateOfProgram}")
@@ -130,8 +143,14 @@ public class ScheduleRESTService {
     public JSONEnvelop<Boolean> deleteRadioProgram(
             @PathParam("dateOfProgram") String dateOfProgram
     ) {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+        JSONEnvelop<Boolean> result = new JSONEnvelop<>();
+        try {
+            service.deleteProgramSlot(DateHelper.getUTC(dateOfProgram));
+            result.setData(true);
+        } catch (Exception e) {
+            result.setError(ErrorHelper.createError(e));
+        }
+        return result;
     }
 
     /**
@@ -147,14 +166,10 @@ public class ScheduleRESTService {
     ) {
         JSONEnvelop<List<ProgramSlot>> result;
         result = new JSONEnvelop<>();
-        LocalDateTime inputDateTime;
         try {
-            inputDateTime = ZonedDateTime
-                    .parse(dateOfProgram, DateTimeFormatter.ISO_DATE_TIME)
-                    .truncatedTo(ChronoUnit.DAYS)
-                    .withZoneSameInstant(ZoneOffset.UTC)
-                    .toLocalDateTime();
-            result.setData(service.findProgramSlots(inputDateTime));
+            result.setData(service.findProgramSlots(
+                    DateHelper.getUTC(dateOfProgram, ChronoUnit.DAYS)
+            ));
         } catch (Exception ex) {
             result.setError(
                     new Error("Error While retrieving the records by date",

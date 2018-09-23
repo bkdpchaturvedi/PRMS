@@ -6,9 +6,7 @@
 package sg.edu.nus.iss.phoenix.schedule.service;
 
 import java.sql.SQLException;
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,13 +60,14 @@ public class ScheduleService {
      * Deletes representation of an instance of resource to persistent data
      * table
      *
-     * @param input
-     * @throws SQLException
+     * @param dateOfProgram
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InUseException
      */
-    public void deleteProgramSlot(ProgramSlot input) throws NotFoundException, InUseException {
+    public void deleteProgramSlot(LocalDateTime dateOfProgram) throws NotFoundException, InUseException {
          try {
-            DAOFactory.getProgramSlotDAO().delete(input);
-            depopulateSchedule(input);
+            DAOFactory.getProgramSlotDAO().delete(dateOfProgram);
+            depopulateSchedule(dateOfProgram);
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, null, e);
             throw new ServiceException(e.getMessage(), e);
@@ -81,21 +80,19 @@ public class ScheduleService {
      *
      * @param dateOfProgram
      * @return
-     * @throws SQLException
      */
     public List<ProgramSlot> findProgramSlots(LocalDateTime dateOfProgram) {
-        ArrayList<ProgramSlot> currentList = new ArrayList<ProgramSlot>();
+        ArrayList<ProgramSlot> result = new ArrayList<ProgramSlot>();
         try {
-            ProgramSlot srchProgramSlot = DAOFactory.getProgramSlotDAO().createValueObject();
-            srchProgramSlot.setDateOfProgram(dateOfProgram);
-            ;
-            currentList = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
-                    .search(srchProgramSlot);
+            ProgramSlot programSlot = DAOFactory.getProgramSlotDAO().createValueObject();
+            programSlot.setDateOfProgram(dateOfProgram);
+            result = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
+                    .search(programSlot, ProgramSlotDAO.DateRangeFilter.BY_DATE);
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, null, e);
+            throw new ServiceException(e.getMessage(), e);
         }
-        return currentList;
+        return result;
     }
 
     /**
@@ -105,27 +102,31 @@ public class ScheduleService {
      * @return
      */
     public List<ProgramSlot> getAllProgramSlots() {
-        //TODO return proper representation object
-        ArrayList<ProgramSlot> currentList = new ArrayList<ProgramSlot>();
+        ArrayList<ProgramSlot> result = new ArrayList<ProgramSlot>();
         try {
-            currentList = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
+            result = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
                     .loadAll();
-        } catch (SQLException | NotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, null, e);
+            throw new ServiceException(e.getMessage(), e);
         }
-        return currentList;
+        return result;
     }
 
     /**
      * Retrieves representation of an instance of resource from persistent data
      * table
      *
+     * @param dateOfProgram
      * @return
      */
-    public ProgramSlot getProgramSlot(LocalDateTime dateOfProgram) {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+    public ProgramSlot getProgramSlot(LocalDateTime dateOfProgram) throws NotFoundException {
+        try {
+            return DAOFactory.getProgramSlotDAO().get(dateOfProgram);
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, null, e);
+            throw new ServiceException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -158,7 +159,7 @@ public class ScheduleService {
                 }
             } catch (SQLException e1) {
                 LOG.log(Level.SEVERE, null, e1);
-                throw new ServiceException(e.getMessage(), e);
+                throw new ServiceException(e1.getMessage(), e1);
             }
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, null, e);
@@ -173,15 +174,15 @@ public class ScheduleService {
      * @param input
      * @throws SQLException
      */
-    private void depopulateSchedule(ProgramSlot input) {
+    private void depopulateSchedule(LocalDateTime dateOfProgram) {
         try {
-            Integer count = DAOFactory.getProgramSlotDAO().checkExisitCount(input.getDateOfProgram(), ProgramSlotDAO.DateRangeFilter.BY_YEAR);
+            Integer count = DAOFactory.getProgramSlotDAO().checkExisitCount(new ProgramSlot(dateOfProgram), ProgramSlotDAO.DateRangeFilter.BY_YEAR);
             if (count == 0) {
                 for (int i = 1; i <= 52; i++) {
                     try {
                         DAOFactory.getWeeklyScheduleDAO().delete(
                                 new WeeklySchedule(
-                                        DateHelper.getWeekStartDate(input.getDateOfProgram().toLocalDate(), i)
+                                        DateHelper.getWeekStartDate(dateOfProgram.toLocalDate(), i)
                                 )
                         );
                     } catch (NotFoundException e) {
@@ -190,7 +191,7 @@ public class ScheduleService {
                 }
                 
                 try {
-                    DAOFactory.getAnnualScheduleDAO().delete(new AnnualSchedule(DateHelper.getWeekYear(input.getDateOfProgram().toLocalDate())));
+                    DAOFactory.getAnnualScheduleDAO().delete(new AnnualSchedule(DateHelper.getWeekYear(dateOfProgram.toLocalDate())));
                 } catch (NotFoundException e) {
                     LOG.log(Level.INFO, e.getMessage());
                 }
@@ -206,13 +207,14 @@ public class ScheduleService {
      * table
      *
      * @param input
+     * @param origin
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.InUseException
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException
      */
-    public void updateProgramSlot(ProgramSlot input, ProgramSlot origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
+    public void updateProgramSlot(ProgramSlot input, LocalDateTime origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
         try {
             populateSchedule(input);
             if (DAOFactory.getProgramSlotDAO().checkOverlap(input, origin)) {

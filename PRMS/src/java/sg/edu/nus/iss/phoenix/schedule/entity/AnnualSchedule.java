@@ -6,7 +6,6 @@
 package sg.edu.nus.iss.phoenix.schedule.entity;
 
 import java.io.Serializable;
-import java.time.LocalTime;
 
 /**
  * AnnualSchedule Value Object. This class is value object representing database

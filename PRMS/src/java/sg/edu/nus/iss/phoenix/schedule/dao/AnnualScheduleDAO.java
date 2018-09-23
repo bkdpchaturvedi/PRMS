@@ -69,7 +69,7 @@ public interface AnnualScheduleDAO {
      * parameter. Returned valueObject will be created using the
      * createValueObject() method.
      *
-     * @param name
+     * @param year
      * @return the annual schedule class instance
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws java.sql.SQLException

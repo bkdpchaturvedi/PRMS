@@ -5,7 +5,6 @@
  */
 package sg.edu.nus.iss.phoenix.schedule.dao.impl;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,48 +35,21 @@ import sg.edu.nus.iss.phoenix.utilities.ExceptionHelper;
  */
 public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
 
-
     private static final Logger LOG = Logger.getLogger(ProgramSlotDAOImpl.class.getName());
-    
+
     @Override
     public ProgramSlot createValueObject() {
         return new ProgramSlot();
     }
-    
+
     @Override
-    public Integer checkExisitCount(LocalDateTime input, DateRangeFilter filter) throws SQLException {
-        PreparedStatement preparedStatement = null;
+    public Integer checkExisitCount(ProgramSlot input, DateRangeFilter filter) throws SQLException {
         openConnection();
         try {
             Integer rowcount = 0;
-            String sql = "SELECT COUNT(*) FROM `phoenix`.`program-slot` WHERE ";
-            switch (filter) {
-                case BY_YEAR:
-                    sql += "dateOfProgram >= ? AND dateOfProgram < ?";
-                    preparedStatement = connection.prepareCall(sql);
-                    preparedStatement.setDate(1, Date.valueOf(DateHelper.getWeekStartDate(input.toLocalDate(), 1)));
-                    preparedStatement.setDate(2, Date.valueOf(DateHelper.getWeekEndDate(input.toLocalDate(), 52).plusDays(1)));
-                    break;
-                case BY_WEEK:
-                    sql += "dateOfProgram >= ? AND dateOfProgram < ?";
-                    preparedStatement = connection.prepareCall(sql);
-                    preparedStatement.setDate(1, Date.valueOf(DateHelper.getWeekStartDate(input.toLocalDate())));
-                    preparedStatement.setDate(2, Date.valueOf(DateHelper.getWeekEndDate(input.toLocalDate().plusDays(1))));
-                    break;
-                case BY_DATE:
-                    sql += "dateOfProgram >= ? AND dateOfProgram < ?";
-                    preparedStatement = connection.prepareCall(sql);
-                    preparedStatement.setDate(1, Date.valueOf(input.truncatedTo(ChronoUnit.DAYS).toLocalDate()));
-                    preparedStatement.setDate(2, Date.valueOf(input.truncatedTo(ChronoUnit.DAYS).plusDays(1).toLocalDate()));
-                    break;
-                case BY_HOUR:
-                    sql += "dateOfProgram >= ? AND dateOfProgram < ?";
-                    preparedStatement = connection.prepareCall(sql);
-                    preparedStatement.setTimestamp(1, Timestamp.valueOf(input.truncatedTo(ChronoUnit.HOURS)));
-                    preparedStatement.setTimestamp(2, Timestamp.valueOf(input.truncatedTo(ChronoUnit.HOURS).plusHours(1)));
-                    break;
-            }
-            ResultSet resultSet = databaseQuery(preparedStatement);
+            String sql = "SELECT COUNT(*) FROM `phoenix`.`program-slot` WHERE 1 = 1";
+            sql += filterQueryBuilder(input, filter);
+            ResultSet resultSet = databaseQuery(connection.prepareStatement(sql));
             if (resultSet.next()) {
                 rowcount = resultSet.getInt(1);
                 LOG.log(Level.INFO, "{0} Program Slot object(s) found.", rowcount);
@@ -92,9 +64,9 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
     public Boolean checkOverlap(ProgramSlot input) throws SQLException {
         return checkOverlap(input, null);
     }
-    
+
     @Override
-    public Boolean checkOverlap(ProgramSlot input, ProgramSlot origin) throws SQLException {
+    public Boolean checkOverlap(ProgramSlot input, LocalDateTime origin) throws SQLException {
         LocalDateTime programSlotStarts = input.getDateOfProgram();
         LocalDateTime programSlotEnds = input.getDateOfProgram()
                 .plusSeconds(input.getDuration().toSecondOfDay());
@@ -119,7 +91,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
             preparedStatement.setTimestamp(5, Timestamp.valueOf(programSlotStarts));
             preparedStatement.setTimestamp(6, Timestamp.valueOf(programSlotEnds));
             if (origin != null) {
-                preparedStatement.setTimestamp(7, Timestamp.valueOf(origin.getDateOfProgram()));
+                preparedStatement.setTimestamp(7, Timestamp.valueOf(origin));
             }
             ResultSet resultSet = databaseQuery(preparedStatement);
             if (resultSet.next()) {
@@ -172,7 +144,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
     }
 
     @Override
-    public void delete(ProgramSlot input) throws NotFoundException, InUseException, SQLException {
+    public void delete(LocalDateTime dateOfProgram) throws NotFoundException, InUseException, SQLException {
         PreparedStatement preparedStatement = null;
         openConnection();
         try {
@@ -181,16 +153,16 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setTimestamp(
                     1,
-                    Timestamp.valueOf(input.getDateOfProgram())
+                    Timestamp.valueOf(dateOfProgram)
             );
             int rowcount = databaseUpdate(preparedStatement);
             if (rowcount == 0) {
-                LOG.log(Level.INFO, "{0} Program Slot object not found", input.getDateOfProgram().toString());
+                LOG.log(Level.INFO, "{0} Program Slot object not found", dateOfProgram.toString());
                 throw new NotFoundException("Program Slot object not found.");
             }
-            LOG.log(Level.INFO, "{0} Program Slot was deleted.", input.getDateOfProgram().toString());
+            LOG.log(Level.INFO, "{0} Program Slot was deleted.", dateOfProgram.toString());
         } catch (SQLException e) {
-            ExceptionHelper.throwDeletionException(e, LOG, input.getDateOfProgram().toString() + " Program Slot");
+            ExceptionHelper.throwDeletionException(e, LOG, dateOfProgram.toString() + " Program Slot");
         } finally {
             if (preparedStatement != null) {
                 preparedStatement.close();
@@ -201,44 +173,56 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
 
     @Override
     public ProgramSlot get(LocalDateTime dateOfProgram) throws SQLException, NotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ProgramSlot result = createValueObject();
+        result.setDateOfProgram(dateOfProgram);
+        load(result);
+        return result;
     }
 
     @Override
     public void load(ProgramSlot input) throws SQLException, NotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<ProgramSlot> loadAll() throws SQLException, NotFoundException {
-
-        super.openConnection();
-
-        String sql = "SELECT * FROM `phoenix`.`program-slot` ORDER BY `dateOfProgram` ASC; ";
-        List<ProgramSlot> searchResults = listQuery(connection.prepareStatement(sql));
-        closeConnection();
-        System.out.println("record size" + searchResults.size());
-        return searchResults;
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-
-    }
-
-    @Override
-    public List<ProgramSlot> search(ProgramSlot input) throws SQLException {
-        openConnection();
         try {
-            String sql = "SELECT * FROM `phoenix`.`program-slot`";
-//                    + " WHERE YEEAR(DateOfProgram) = '" + year ;
-            List<ProgramSlot> result = listQuery(connection.prepareStatement(sql));
-            LOG.log(Level.INFO, "{0} overlap Program Slot found.", result.size());
-            return null;// !result.isEmpty();
+            openConnection();
+            String sql = "SELECT * FROM `phoenix`.`program-slot` WHERE dateOfProgram = '" + input.getDateOfProgram() + "'";
+            singleQuery(connection.prepareStatement(sql), input);
+            LOG.log(Level.INFO, "{0} Program Slot loaded.", input.getDateOfProgram());
         } finally {
             closeConnection();
         }
     }
 
     @Override
-    public void update(ProgramSlot input, ProgramSlot origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
+    public List<ProgramSlot> loadAll() throws SQLException {
+        List<ProgramSlot> result = new ArrayList<>();
+        try {
+            openConnection();
+            String sql = "SELECT * FROM `phoenix`.`program-slot` ORDER BY `dateOfProgram` ASC; ";
+            result = listQuery(connection.prepareStatement(sql));
+            LOG.log(Level.INFO, "{0} Program Slot loaded.", result.size());
+        } finally {
+            closeConnection();
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProgramSlot> search(ProgramSlot input, DateRangeFilter filter) throws SQLException {
+        List<ProgramSlot> result = new ArrayList<>();
+        try {
+            openConnection();
+            String sql = "SELECT * FROM `phoenix`.`program-slot` WHERE 1 = 1";
+            sql += filterQueryBuilder(input, filter);
+            sql += " ORDER BY `dateOfProgram` ASC";
+            result = listQuery(connection.prepareStatement(sql));
+            LOG.log(Level.INFO, "{0} Program Slot found.", result.size());
+        } finally {
+            closeConnection();
+        }
+        return result;
+    }
+
+    @Override
+    public void update(ProgramSlot input, LocalDateTime origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
         PreparedStatement preparedStatement = null;
         openConnection();
         try {
@@ -262,11 +246,11 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
             preparedStatement.setString(6, input.getAssignedBy());
             preparedStatement.setTimestamp(
                     7,
-                    Timestamp.valueOf(origin.getDateOfProgram())
+                    Timestamp.valueOf(origin)
             );
             int rowcount = databaseUpdate(preparedStatement);
             if (rowcount == 0) {
-                LOG.log(Level.INFO, "{0} Program Slot object not found", origin.getDateOfProgram().toString());
+                LOG.log(Level.INFO, "{0} Program Slot object not found", origin.toString());
                 throw new NotFoundException("Program Slot object not found.");
             }
             LOG.log(Level.INFO, "{0} Program Slot was update.", input.getDateOfProgram().toString());
@@ -279,12 +263,81 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
             closeConnection();
         }
     }
-    
+
     /**
-     * databaseQuery-method. This method is a helper method for internal use.
-     * It will execute all database handling that will query the information in
-     * tables. For the SELECT queries only to be executed here. The return
-     * value indicates the records set from the table.
+     * filterQueryBuilder-method. This method is a helper method for internal
+     * use. It will build query string for the information searching in tables.
+     * Based on the input value object.
+     *
+     * @param input
+     * @param filter
+     * @return
+     */
+    protected String filterQueryBuilder(ProgramSlot input, DateRangeFilter filter) {
+        String sql = "";
+        if (input.getDateOfProgram() != null) {
+            switch (filter) {
+                case BY_FUTURE:
+                    sql += " AND (DateOfProgram >= '" + LocalDateTime.now()
+                            + "')";
+                    break;
+                case BY_YEAR:
+                    sql += " AND (dateOfProgram >= '"
+                            + DateHelper.getWeekStartDate(
+                                    input.getDateOfProgram().toLocalDate(), 1)
+                            + "' AND dateOfProgram < '"
+                            + DateHelper.getWeekEndDate(
+                                    input.getDateOfProgram().toLocalDate(), 52)
+                                    .plusDays(1) + "')";
+                    break;
+                case BY_WEEK:
+                    sql += " AND (dateOfProgram >= '"
+                            + DateHelper.getWeekStartDate(
+                                    input.getDateOfProgram().toLocalDate())
+                            + "' AND dateOfProgram < '"
+                            + DateHelper.getWeekEndDate(
+                                    input.getDateOfProgram().toLocalDate()
+                                            .plusDays(1)) + "')";
+                    break;
+                case BY_DATE:
+                    sql += " AND dateOfProgram >= '"
+                            + input.getDateOfProgram()
+                                    .truncatedTo(ChronoUnit.DAYS).toLocalDate()
+                            + "' AND dateOfProgram < '"
+                            + input.getDateOfProgram()
+                                    .truncatedTo(ChronoUnit.DAYS)
+                                    .plusDays(1).toLocalDate() + "')";
+                    break;
+                case BY_HOUR:
+                    sql += " AND dateOfProgram >= '"
+                            + input.getDateOfProgram()
+                                    .truncatedTo(ChronoUnit.HOURS)
+                            + "' AND dateOfProgram < '"
+                            + input.getDateOfProgram()
+                                    .truncatedTo(ChronoUnit.HOURS)
+                                    .plusHours(1) + "')";
+            }
+        }
+        if (input.getRadioProgram() != null) {
+            sql += " AND (program-name = '"
+                    + input.getRadioProgram().getName() + "')";
+        }
+        if (input.getPresenter() != null) {
+            sql += " AND (presenter = '"
+                    + input.getPresenter().getId() + "')";
+        }
+        if (input.getProducer() != null) {
+            sql += " AND (presenter = '"
+                    + input.getProducer().getId() + "')";
+        }
+        return sql;
+    }
+
+    /**
+     * databaseQuery-method. This method is a helper method for internal use. It
+     * will execute all database handling that will query the information in
+     * tables. For the SELECT queries only to be executed here. The return value
+     * indicates the records set from the table.
      *
      * @param preparedStatement This parameter contains the SQL statement to be
      * executed.

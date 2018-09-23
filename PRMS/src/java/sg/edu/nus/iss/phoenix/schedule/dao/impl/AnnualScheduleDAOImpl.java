@@ -139,7 +139,7 @@ public class AnnualScheduleDAOImpl extends DBConnector implements AnnualSchedule
      *
      * @param preparedStatement This parameter contains the SQL statement to be
      * executed.
-     * @param programSlot Class-instance where resulting data will be stored.
+     * @param annualSchedule
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws java.sql.SQLException
      */
