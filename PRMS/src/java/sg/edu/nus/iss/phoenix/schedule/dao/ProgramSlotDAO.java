@@ -21,6 +21,7 @@ import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 public interface ProgramSlotDAO {
 
     static enum DateRangeFilter {
+        BY_FUTURE,
         BY_YEAR,
         BY_WEEK,
         BY_DATE,
@@ -47,7 +48,7 @@ public interface ProgramSlotDAO {
      * @return boolean
      * @throws java.sql.SQLException
      */
-    public abstract Integer checkExisitCount(LocalDateTime input, 
+    public abstract Integer checkExisitCount(ProgramSlot input, 
             DateRangeFilter filter) throws SQLException;
 
     /**
@@ -72,7 +73,7 @@ public interface ProgramSlotDAO {
      * @return boolean
      * @throws java.sql.SQLException
      */
-    public abstract Boolean checkOverlap(ProgramSlot input, ProgramSlot origin) throws SQLException;
+    public abstract Boolean checkOverlap(ProgramSlot input, LocalDateTime origin) throws SQLException;
 
     /**
      * create-method. This will create new row in database according to supplied
@@ -101,12 +102,12 @@ public interface ProgramSlotDAO {
      * what it was in the deleted object. If delete can not find matching row,
      * NotFoundException will be thrown.
      *
-     * @param input This parameter contains the class instance to be deleted.
-     * Primary-key field must be set for this to work properly.
+     * @param dateOfProgram
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InUseException
      * @throws java.sql.SQLException
      */
-    public abstract void delete(ProgramSlot input)
+    public abstract void delete(LocalDateTime dateOfProgram)
             throws NotFoundException, InUseException, SQLException;
 
     /**
@@ -152,7 +153,7 @@ public interface ProgramSlotDAO {
      * @throws java.sql.SQLException
      */
     public abstract List<ProgramSlot> loadAll()
-            throws SQLException, NotFoundException;
+            throws SQLException;
 
     /**
      * search-Method. This method provides searching capability to get matching
@@ -169,7 +170,7 @@ public interface ProgramSlotDAO {
      * @return list of the class instance
      * @throws java.sql.SQLException
      */
-    public abstract List<ProgramSlot> search(ProgramSlot input)
+    public abstract List<ProgramSlot> search(ProgramSlot input, DateRangeFilter filter)
             throws SQLException;
 
 //    /**
@@ -203,6 +204,6 @@ public interface ProgramSlotDAO {
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws java.sql.SQLException
      */
-    public abstract void update(ProgramSlot input, ProgramSlot origin)
+    public abstract void update(ProgramSlot input, LocalDateTime origin)
             throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException;
 }

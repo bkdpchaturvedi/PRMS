@@ -49,7 +49,7 @@ public class UserRESTService {
      * @return an instance of JSONEnvelop of User
      */
     @GET
-    @Path("/{id}")
+    @Path("/getbyid/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public JSONEnvelop<User> getUser(@PathParam("id") String id) {
         JSONEnvelop<User> result = new JSONEnvelop<User>();
@@ -178,7 +178,7 @@ public class UserRESTService {
      * @param id unique identifier for user
      */
     @DELETE
-    @Path("/delete/{id}")
+    @Path("/deletebyid/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public JSONEnvelop<Boolean> deleteUser(
             @PathParam("id") String id

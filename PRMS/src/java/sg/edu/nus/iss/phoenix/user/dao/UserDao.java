@@ -162,7 +162,14 @@ public interface UserDao {
 
 	public abstract User searchMatching(String uid)
 			throws SQLException;
-
+	
+	/**
+	 * getUsersByRole-method . This method will take a Role as an input parammeter
+	 * and retrieve the corresponding users from the DB with the specific Role
+	 * @param role
+	 * @return
+	 * @throws SQLException
+	 */
 	public abstract List<User> getUsersByRole(Role role)
 			throws SQLException;
 }

@@ -334,6 +334,13 @@ public class UserDaoImpl implements UserDao {
 		return searchResults;
 	}
 
+	/**
+	 * getUsersByRole-method . This method will take a Role as an input parammeter
+	 * and retrieve the corresponding users from the DB with the specific Role
+	 * @param role
+	 * @return
+	 * @throws SQLException
+	 */
 	@Override
 	public List<User> getUsersByRole(Role role) throws SQLException {
 		List<User> searchResults;

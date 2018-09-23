@@ -5,7 +5,6 @@
  */
 package sg.edu.nus.iss.phoenix.schedule.service;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.After;
@@ -128,7 +127,7 @@ public class ScheduleServiceTest {
         toUpdate.getPresenter().setId("wizard");
         toUpdate.getProducer().setId("wizard");
         toUpdate.setAssignedBy("wizard");
-        service.updateProgramSlot(toUpdate, new ProgramSlot(toCreate.getDateOfProgram()));
+        service.updateProgramSlot(toUpdate, toCreate.getDateOfProgram());
     }
 
     @Test
@@ -138,13 +137,13 @@ public class ScheduleServiceTest {
         toUpdate.getPresenter().setId(null);
         toUpdate.getProducer().setId(null);
         toUpdate.setAssignedBy(null);
-        service.updateProgramSlot(toUpdate, new ProgramSlot(toCreate.getDateOfProgram()));
+        service.updateProgramSlot(toUpdate, toCreate.getDateOfProgram());
     }
 
     @Test
     public void test10_updateProgramSlot_withNewPeriod_shouldUpdate() {
         try {
-            service.updateProgramSlot(toUpdate, new ProgramSlot(toCreate.getDateOfProgram()));
+            service.updateProgramSlot(toUpdate, toCreate.getDateOfProgram());
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -154,25 +153,25 @@ public class ScheduleServiceTest {
     public void test11_updateProgramSlot_withNotValidOrigin_shouldThrowNotFound() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
         thrown.expect(NotFoundException.class);
         toUpdate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:20:00"));
-        service.updateProgramSlot(toUpdate, new ProgramSlot(toCreate.getDateOfProgram()));
+        service.updateProgramSlot(toUpdate, toCreate.getDateOfProgram());
     }
 
     @Test
     public void test12_updateProgramSlot_withNotValidOrigin_shouldThrowOverlap() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
         thrown.expect(OverlapException.class);
-        service.updateProgramSlot(toCreate, new ProgramSlot(toCreate.getDateOfProgram()));
+        service.updateProgramSlot(toCreate, toCreate.getDateOfProgram());
     }
 
     @Test
     public void test13_deleteProgramSlot_withNotValidOrigin_shouldThrowNotFound() throws NotFoundException, InUseException {
         thrown.expect(NotFoundException.class);
-        service.deleteProgramSlot(new ProgramSlot(toCreate.getDateOfProgram()));
+        service.deleteProgramSlot(toCreate.getDateOfProgram());
     }
 
     @Test
     public void test14_deleteProgramSlot_withValidOrigin_shouldDelete() {
         try {
-            service.deleteProgramSlot(new ProgramSlot(toUpdate.getDateOfProgram()));
+            service.deleteProgramSlot(toUpdate.getDateOfProgram());
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
