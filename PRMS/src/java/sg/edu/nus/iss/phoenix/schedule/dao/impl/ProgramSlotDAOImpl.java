@@ -43,12 +43,12 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
     }
 
     @Override
-    public Integer checkExisitCount(ProgramSlot input, DateRangeFilter filter) throws SQLException {
+    public Integer checkExisitCount(ProgramSlot input, DateRangeFilter filter, FieldsOpreation opreation) throws SQLException {
         openConnection();
         try {
             Integer rowcount = 0;
-            String sql = "SELECT COUNT(*) FROM `phoenix`.`program-slot` WHERE 1 = 1";
-            sql += filterQueryBuilder(input, filter);
+            String sql = "SELECT COUNT(*) FROM `phoenix`.`program-slot`";
+            filterQueryBuilder(input, filter, opreation);
             ResultSet resultSet = databaseQuery(connection.prepareStatement(sql));
             if (resultSet.next()) {
                 rowcount = resultSet.getInt(1);
@@ -206,12 +206,12 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
     }
 
     @Override
-    public List<ProgramSlot> search(ProgramSlot input, DateRangeFilter filter) throws SQLException {
+    public List<ProgramSlot> search(ProgramSlot input, DateRangeFilter filter, FieldsOpreation opreation) throws SQLException {
         List<ProgramSlot> result = new ArrayList<>();
         try {
             openConnection();
             String sql = "SELECT * FROM `phoenix`.`program-slot` WHERE 1 = 1";
-            sql += filterQueryBuilder(input, filter);
+            sql += filterQueryBuilder(input, filter, opreation);
             sql += " ORDER BY `dateOfProgram` ASC";
             result = listQuery(connection.prepareStatement(sql));
             LOG.log(Level.INFO, "{0} Program Slot found.", result.size());
@@ -271,18 +271,29 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
      *
      * @param input
      * @param filter
+     * @param opreation
      * @return
      */
-    protected String filterQueryBuilder(ProgramSlot input, DateRangeFilter filter) {
+    protected String filterQueryBuilder(ProgramSlot input, DateRangeFilter filter, FieldsOpreation opreation) {
         String sql = "";
+        String queryOpreation  = "";
+        switch (opreation) {
+            case AND:
+                queryOpreation = " AND";
+                break;
+            case OR:
+            queryOpreation = " OR";
+            break;
+        }
+        
         if (input.getDateOfProgram() != null) {
             switch (filter) {
                 case BY_FUTURE:
-                    sql += " AND (DateOfProgram >= '" + LocalDateTime.now()
+                    sql += queryOpreation + " (DateOfProgram >= '" + LocalDateTime.now()
                             + "')";
                     break;
                 case BY_YEAR:
-                    sql += " AND (dateOfProgram >= '"
+                    sql += queryOpreation + " (dateOfProgram >= '"
                             + DateHelper.getWeekStartDate(
                                     input.getDateOfProgram().toLocalDate(), 1)
                             + "' AND dateOfProgram < '"
@@ -291,7 +302,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
                                     .plusDays(1) + "')";
                     break;
                 case BY_WEEK:
-                    sql += " AND (dateOfProgram >= '"
+                    sql += queryOpreation + " (dateOfProgram >= '"
                             + DateHelper.getWeekStartDate(
                                     input.getDateOfProgram().toLocalDate())
                             + "' AND dateOfProgram < '"
@@ -300,7 +311,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
                                             .plusDays(1)) + "')";
                     break;
                 case BY_DATE:
-                    sql += " AND dateOfProgram >= '"
+                    sql += queryOpreation + " (dateOfProgram >= '"
                             + input.getDateOfProgram()
                                     .truncatedTo(ChronoUnit.DAYS).toLocalDate()
                             + "' AND dateOfProgram < '"
@@ -309,7 +320,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
                                     .plusDays(1).toLocalDate() + "')";
                     break;
                 case BY_HOUR:
-                    sql += " AND dateOfProgram >= '"
+                    sql += queryOpreation + " (dateOfProgram >= '"
                             + input.getDateOfProgram()
                                     .truncatedTo(ChronoUnit.HOURS)
                             + "' AND dateOfProgram < '"
@@ -319,16 +330,19 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
             }
         }
         if (input.getRadioProgram() != null) {
-            sql += " AND (program-name = '"
+            sql += queryOpreation + " (program-name = '"
                     + input.getRadioProgram().getName() + "')";
         }
         if (input.getPresenter() != null) {
-            sql += " AND (presenter = '"
+            sql += queryOpreation + " AND (presenter = '"
                     + input.getPresenter().getId() + "')";
         }
         if (input.getProducer() != null) {
-            sql += " AND (presenter = '"
+            sql += queryOpreation + " AND (presenter = '"
                     + input.getProducer().getId() + "')";
+        }
+        if (sql != "") {
+            sql = " WHERE" + sql.replaceFirst(queryOpreation, "");
         }
         return sql;
     }

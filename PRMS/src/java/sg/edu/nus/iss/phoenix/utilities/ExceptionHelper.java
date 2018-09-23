@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
 import sg.edu.nus.iss.phoenix.core.exceptions.InUseException;
 import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
-import sg.edu.nus.iss.phoenix.core.exceptions.ServiceException;
 
 /**
  *

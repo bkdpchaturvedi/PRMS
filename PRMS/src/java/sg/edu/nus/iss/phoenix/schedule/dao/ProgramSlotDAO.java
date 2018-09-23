@@ -20,12 +20,27 @@ import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
  */
 public interface ProgramSlotDAO {
 
+    /**
+     * DateRangeFilter. This to be used as flag parameter in the searching
+     * methods like search method and checkExistCount regarding for date of
+     * program field searching.
+     */
     static enum DateRangeFilter {
         BY_FUTURE,
         BY_YEAR,
         BY_WEEK,
         BY_DATE,
         BY_HOUR
+    }
+
+    /**
+     * DateRangeFilter. This to be used as flag parameter in the searching
+     * methods like search method and checkExistCount regarding about operation
+     * of the each other fields.
+     */
+    static enum FieldsOpreation {
+        AND,
+        OR
     }
 
     /**
@@ -45,11 +60,14 @@ public interface ProgramSlotDAO {
      *
      * @param input the program slot class instance
      * @param filter
+     * @param opreation
      * @return boolean
      * @throws java.sql.SQLException
      */
-    public abstract Integer checkExisitCount(ProgramSlot input, 
-            DateRangeFilter filter) throws SQLException;
+    public abstract Integer checkExisitCount(ProgramSlot input
+            , DateRangeFilter filter
+            , FieldsOpreation opreation) 
+            throws SQLException;
 
     /**
      * checkOverlap-method. This will check with the existing data from table
@@ -167,10 +185,13 @@ public interface ProgramSlotDAO {
      * @param input This parameter contains the class instance where search will
      * be based. Primary-key field should not be set.
      * @param filter
+     * @param opreation
      * @return list of the class instance
      * @throws java.sql.SQLException
      */
-    public abstract List<ProgramSlot> search(ProgramSlot input, DateRangeFilter filter)
+    public abstract List<ProgramSlot> search(ProgramSlot input
+            , DateRangeFilter filter
+            , FieldsOpreation opreation)
             throws SQLException;
 
 //    /**

@@ -5,6 +5,8 @@
  */
 package sg.edu.nus.iss.phoenix.utilities;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
 import sg.edu.nus.iss.phoenix.core.exceptions.InUseException;
 import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
@@ -20,7 +22,7 @@ import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
  */
 public class ErrorHelper {
 
-    public static Error createError(Exception e) {
+    public static Error createError(Exception e, Logger LOG) {
         if (e instanceof DuplicateException) {
             return new Error(ErrorConstant.ERR_DUPLICATE, e.getMessage());
         }
@@ -42,6 +44,7 @@ public class ErrorHelper {
         if (e instanceof OverlapException) {
             return new Error(ErrorConstant.ERR_SCHEDULE_OVERLAP, e.getMessage());
         }
+        LOG.log(Level.SEVERE, e.getMessage(),e.getCause());
         return new Error(ErrorConstant.ERR_RUNTIME, e.getMessage());
     }
 }

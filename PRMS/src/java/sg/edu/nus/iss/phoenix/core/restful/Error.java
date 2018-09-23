@@ -23,6 +23,14 @@ public class Error implements Serializable {
      *
      * @return
      */
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -32,18 +40,9 @@ public class Error implements Serializable {
     }
 
     /**
-     * Constructors. The first one takes no arguments and provides the most
-     * simple way to create object instance. The another one takes arguments,
-     * which is the details attributes of the object instance.
+     * ConstructorÏs. Constructor with details attributes of the object
+     * instance.
      */
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-    }
-
     public Error(String error, String description) {
         this.error = error;
         this.description = description;

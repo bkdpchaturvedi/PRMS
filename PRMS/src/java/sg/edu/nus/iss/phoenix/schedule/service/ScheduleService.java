@@ -84,11 +84,17 @@ public class ScheduleService {
     public List<ProgramSlot> findProgramSlots(LocalDateTime dateOfProgram) {
         ArrayList<ProgramSlot> result = new ArrayList<ProgramSlot>();
         try {
-            ProgramSlot programSlot = DAOFactory.getProgramSlotDAO().createValueObject();
-            programSlot.setDateOfProgram(dateOfProgram);
+            ProgramSlot input = DAOFactory.getProgramSlotDAO().createValueObject();
+            input.setDateOfProgram(dateOfProgram);
             result = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
-                    .search(programSlot, ProgramSlotDAO.DateRangeFilter.BY_DATE);
-        } catch (SQLException e) {
+                    .search(input
+                            , ProgramSlotDAO.DateRangeFilter.BY_DATE
+                            , ProgramSlotDAO.FieldsOpreation.AND);
+            for (ProgramSlot programSlot : result) {
+                DAOFactory.getUserDAO().load(programSlot.getPresenter());
+                DAOFactory.getUserDAO().load(programSlot.getProducer());
+            }
+        } catch (SQLException | NotFoundException e) {
             LOG.log(Level.SEVERE, null, e);
             throw new ServiceException(e.getMessage(), e);
         }
@@ -106,7 +112,11 @@ public class ScheduleService {
         try {
             result = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
                     .loadAll();
-        } catch (SQLException e) {
+            for (ProgramSlot programSlot : result) {
+                DAOFactory.getUserDAO().load(programSlot.getPresenter());
+                DAOFactory.getUserDAO().load(programSlot.getProducer());
+            }
+        } catch (SQLException | NotFoundException e) {
             LOG.log(Level.SEVERE, null, e);
             throw new ServiceException(e.getMessage(), e);
         }
@@ -122,13 +132,41 @@ public class ScheduleService {
      */
     public ProgramSlot getProgramSlot(LocalDateTime dateOfProgram) throws NotFoundException {
         try {
-            return DAOFactory.getProgramSlotDAO().get(dateOfProgram);
+            ProgramSlot result = DAOFactory.getProgramSlotDAO().get(dateOfProgram);
+            DAOFactory.getUserDAO().load(result.getPresenter());
+            DAOFactory.getUserDAO().load(result.getProducer());
+            return result;
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, null, e);
             throw new ServiceException(e.getMessage(), e);
         }
     }
 
+    /**
+     * Updates representation of an instance of resource to persistent data
+     * table
+     *
+     * @param input
+     * @param origin
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InUseException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
+     * @throws sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException
+     */
+    public void updateProgramSlot(ProgramSlot input, LocalDateTime origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
+        try {
+            populateSchedule(input);
+            if (DAOFactory.getProgramSlotDAO().checkOverlap(input, origin)) {
+                throw new OverlapException("Other Program Slot object exists on the given date time and duration.");
+            }
+            DAOFactory.getProgramSlotDAO().update(input, origin);
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, null, e);
+            throw new ServiceException(e.getMessage(), e);
+        }
+    }
+    
     /**
      * Creating the relative representation of an instance of resources to
      * persistent data table
@@ -176,7 +214,10 @@ public class ScheduleService {
      */
     private void depopulateSchedule(LocalDateTime dateOfProgram) {
         try {
-            Integer count = DAOFactory.getProgramSlotDAO().checkExisitCount(new ProgramSlot(dateOfProgram), ProgramSlotDAO.DateRangeFilter.BY_YEAR);
+            Integer count = DAOFactory.getProgramSlotDAO().checkExisitCount(
+                    new ProgramSlot(dateOfProgram)
+                    , ProgramSlotDAO.DateRangeFilter.BY_YEAR
+                    , ProgramSlotDAO.FieldsOpreation.AND);
             if (count == 0) {
                 for (int i = 1; i <= 52; i++) {
                     try {
@@ -196,31 +237,6 @@ public class ScheduleService {
                     LOG.log(Level.INFO, e.getMessage());
                 }
             }
-        } catch (SQLException e) {
-            LOG.log(Level.SEVERE, null, e);
-            throw new ServiceException(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Updates representation of an instance of resource to persistent data
-     * table
-     *
-     * @param input
-     * @param origin
-     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
-     * @throws sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException
-     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InUseException
-     * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
-     * @throws sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException
-     */
-    public void updateProgramSlot(ProgramSlot input, LocalDateTime origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
-        try {
-            populateSchedule(input);
-            if (DAOFactory.getProgramSlotDAO().checkOverlap(input, origin)) {
-                throw new OverlapException("Other Program Slot object exists on the given date time and duration.");
-            }
-            DAOFactory.getProgramSlotDAO().update(input, origin);
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, null, e);
             throw new ServiceException(e.getMessage(), e);

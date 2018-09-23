@@ -24,7 +24,6 @@ import javax.ws.rs.core.MediaType;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 import sg.edu.nus.iss.phoenix.schedule.service.ScheduleService;
 import sg.edu.nus.iss.phoenix.core.restful.JSONEnvelop;
-import sg.edu.nus.iss.phoenix.core.restful.Error;
 import sg.edu.nus.iss.phoenix.utilities.DateHelper;
 import sg.edu.nus.iss.phoenix.utilities.ErrorHelper;
 
@@ -41,7 +40,6 @@ public class ScheduleRESTService {
     private UriInfo context;
     private ScheduleService service;
     private static final Logger LOG = Logger.getLogger(ScheduleRESTService.class.getName());
-    
 
     /**
      * Creates a new instance of ScheduleRESTService
@@ -68,7 +66,7 @@ public class ScheduleRESTService {
                     service.getProgramSlot(DateHelper.getUTC(dateOfProgram))
             );
         } catch (Exception e) {
-            result.setError(ErrorHelper.createError(e));
+            result.setError(ErrorHelper.createError(e, LOG));
         }
         return result;
     }
@@ -87,7 +85,7 @@ public class ScheduleRESTService {
         try {
             result.setData(service.getAllProgramSlots());
         } catch (Exception e) {
-            result.setError(ErrorHelper.createError(e));
+            result.setError(ErrorHelper.createError(e, LOG));
         }
         return result;
     }
@@ -96,6 +94,7 @@ public class ScheduleRESTService {
      * POST method for creating an instance of resource
      *
      * @param input representation for the resource
+     * @return
      */
     @POST
     @Path("/create")
@@ -106,7 +105,7 @@ public class ScheduleRESTService {
             service.createProgramSlot(input);
             result.setData(true);
         } catch (Exception e) {
-            result.setError(ErrorHelper.createError(e));
+            result.setError(ErrorHelper.createError(e, LOG));
         }
         return result;
     }
@@ -126,7 +125,7 @@ public class ScheduleRESTService {
             service.updateProgramSlot(input, DateHelper.getUTC(dateOfProgram));
             result.setData(true);
         } catch (Exception e) {
-            result.setError(ErrorHelper.createError(e));
+            result.setError(ErrorHelper.createError(e, LOG));
         }
         return result;
     }
@@ -135,7 +134,7 @@ public class ScheduleRESTService {
      * DELETE method for deleting an instance of resource
      *
      * @param dateOfProgram date time of the resource
-     * @return 
+     * @return
      */
     @DELETE
     @Path("/delete/{dateOfProgram}")
@@ -148,7 +147,7 @@ public class ScheduleRESTService {
             service.deleteProgramSlot(DateHelper.getUTC(dateOfProgram));
             result.setData(true);
         } catch (Exception e) {
-            result.setError(ErrorHelper.createError(e));
+            result.setError(ErrorHelper.createError(e, LOG));
         }
         return result;
     }
@@ -170,11 +169,8 @@ public class ScheduleRESTService {
             result.setData(service.findProgramSlots(
                     DateHelper.getUTC(dateOfProgram, ChronoUnit.DAYS)
             ));
-        } catch (Exception ex) {
-            result.setError(
-                    new Error("Error While retrieving the records by date",
-                            ex.getMessage())
-            );
+        } catch (Exception e) {
+            result.setError(ErrorHelper.createError(e, LOG));
         }
 
         //TODO return proper representation object
