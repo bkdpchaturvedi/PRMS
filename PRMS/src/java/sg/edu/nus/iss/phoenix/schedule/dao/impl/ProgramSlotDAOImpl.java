@@ -43,7 +43,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
     }
 
     @Override
-    public Integer checkExisitCount(ProgramSlot input, DateRangeFilter filter, FieldsOpreation opreation) throws SQLException {
+    public Integer checkExistCount(ProgramSlot input, DateRangeFilter filter, FieldsOpreation opreation) throws SQLException {
         openConnection();
         try {
             Integer rowcount = 0;

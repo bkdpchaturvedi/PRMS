@@ -54,7 +54,7 @@ public interface ProgramSlotDAO {
     public abstract ProgramSlot createValueObject();
 
     /**
-     * checkExisitCount-method. This will check the record counts of existing
+     * checkExistCount-method. This will check the record counts of existing
      * data from table using given data from input object contents and Date
      * range filter type.
      *
@@ -64,7 +64,7 @@ public interface ProgramSlotDAO {
      * @return boolean
      * @throws java.sql.SQLException
      */
-    public abstract Integer checkExisitCount(ProgramSlot input
+    public abstract Integer checkExistCount(ProgramSlot input
             , DateRangeFilter filter
             , FieldsOpreation opreation) 
             throws SQLException;

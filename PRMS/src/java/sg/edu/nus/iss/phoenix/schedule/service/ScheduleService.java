@@ -214,7 +214,7 @@ public class ScheduleService {
      */
     private void depopulateSchedule(LocalDateTime dateOfProgram) {
         try {
-            Integer count = DAOFactory.getProgramSlotDAO().checkExisitCount(
+            Integer count = DAOFactory.getProgramSlotDAO().checkExistCount(
                     new ProgramSlot(dateOfProgram)
                     , ProgramSlotDAO.DateRangeFilter.BY_YEAR
                     , ProgramSlotDAO.FieldsOpreation.AND);

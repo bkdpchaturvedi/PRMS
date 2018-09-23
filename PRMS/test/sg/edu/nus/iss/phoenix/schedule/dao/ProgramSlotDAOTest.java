@@ -1,0 +1,221 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package sg.edu.nus.iss.phoenix.schedule.dao;
+
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.junit.FixMethodOrder;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+import org.junit.runners.MethodSorters;
+import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InUseException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
+import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
+import sg.edu.nus.iss.phoenix.schedule.dao.impl.ProgramSlotDAOImpl;
+import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
+import sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException;
+
+/**
+ *
+ * @author MyatMin
+ */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class ProgramSlotDAOTest {
+
+    private ProgramSlot toCreate;
+    private ProgramSlot toUpdate;
+    private static ProgramSlotDAO programSlotDAO;
+
+    public ProgramSlotDAOTest() {
+
+    }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @BeforeClass
+    public static void setUpClass() {
+        programSlotDAO = new ProgramSlotDAOImpl();
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        programSlotDAO = null;
+    }
+
+    @Before
+    public void setUp() {
+        toCreate = new ProgramSlot(LocalDateTime.parse("2000-01-01T00:00:00"), LocalTime.parse("00:10:00"), "news", "dilbert", "wally", "pointyhead");
+        toUpdate = new ProgramSlot(LocalDateTime.parse("2000-01-01T00:05:00"), LocalTime.parse("00:15:00"), "news", "dilbert", "dogbert", "catbert");
+    }
+
+    @After
+    public void tearDown() {
+        toCreate = null;
+        toUpdate = null;
+    }
+
+    @Test
+    public void test01_create_withNotExistedKeys_shouldThrowInvalidData() throws DuplicateException, InvalidDataException, SQLException {
+        thrown.expect(InvalidDataException.class);
+        toCreate.getRadioProgram().setName("spell");
+        toCreate.getPresenter().setId("wizard");
+        toCreate.getProducer().setId("wizard");
+        toCreate.setAssignedBy("wizard");
+        programSlotDAO.create(toCreate);
+    }
+
+    @Test
+    public void test02_create_withNullKeys_shouldThrowInvalidData() throws DuplicateException, InvalidDataException, SQLException {
+        thrown.expect(InvalidDataException.class);
+        toCreate.getRadioProgram().setName(null);
+        toCreate.getPresenter().setId(null);
+        toCreate.getProducer().setId(null);
+        toCreate.setAssignedBy(null);
+        programSlotDAO.create(toCreate);
+    }
+
+    @Test
+    public void test03_create_withNewPeriod_shouldCreate() {
+        try {
+            programSlotDAO.create(toCreate);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void test04_get_withExistedDateOfProgram_shouldGet() {
+        try {
+            ProgramSlot result = programSlotDAO.get(toCreate.getDateOfProgram());
+            assertNotNull(result);
+            assertEquals(toCreate.getRadioProgram().getName(), result.getRadioProgram().getName());
+            assertEquals(toCreate.getPresenter().getId(), result.getPresenter().getId());
+            assertEquals(toCreate.getProducer().getId(), result.getProducer().getId());
+            assertEquals(toCreate.getAssignedBy(), result.getAssignedBy());
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void test05_get_withNotExistedDateOfProgram__shouldThrowNotFound() throws SQLException, NotFoundException {
+        thrown.expect(NotFoundException.class);
+        programSlotDAO.get(toUpdate.getDateOfProgram());
+    }
+    
+    @Test
+    public void test06_load_withExistedDateOfProgram_shouldLoad() {
+        try {
+            ProgramSlot result = new ProgramSlot(toCreate.getDateOfProgram());
+            programSlotDAO.load(result);
+            assertEquals(toCreate.getRadioProgram().getName(), result.getRadioProgram().getName());
+            assertEquals(toCreate.getPresenter().getId(), result.getPresenter().getId());
+            assertEquals(toCreate.getProducer().getId(), result.getProducer().getId());
+            assertEquals(toCreate.getAssignedBy(), result.getAssignedBy());
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void test07_load_withNotExistedDateOfProgram__shouldThrowNotFound() throws SQLException, NotFoundException {
+        thrown.expect(NotFoundException.class);
+        ProgramSlot result = new ProgramSlot(toUpdate.getDateOfProgram());
+        programSlotDAO.load(result);
+    }
+    
+    @Test
+    public void test08_load_withEsixtedDate_shouldFoundOne() {
+        try {
+            List<ProgramSlot> result = programSlotDAO.search(new ProgramSlot(toCreate.getDateOfProgram()), ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
+            assertEquals(1, result.size());
+            assertEquals(toCreate.getRadioProgram().getName(), result.get(0).getRadioProgram().getName());
+            assertEquals(toCreate.getPresenter().getId(), result.get(0).getPresenter().getId());
+            assertEquals(toCreate.getProducer().getId(), result.get(0).getProducer().getId());
+            assertEquals(toCreate.getAssignedBy(), result.get(0).getAssignedBy());
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    
+    @Test
+    public void test09_load_withNonEsixtedDate_shouldFoundNone() {
+        try {;
+            List<ProgramSlot> result = programSlotDAO.search(new ProgramSlot(LocalDateTime.parse("1999-12-31T23:55:00")), ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
+            assertEquals(0, result.size());
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void test10_create_withExactDateOfProgram_shouldThrowDuplicate() throws DuplicateException, InvalidDataException, SQLException {
+        thrown.expect(DuplicateException.class);
+        programSlotDAO.create(toCreate);
+    }
+
+    @Test
+    public void test11_update_withNotExistedKeys_shouldThrowInvalidData() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
+        thrown.expect(InvalidDataException.class);
+        toUpdate.getRadioProgram().setName("spell");
+        toUpdate.getPresenter().setId("wizard");
+        toUpdate.getProducer().setId("wizard");
+        toUpdate.setAssignedBy("wizard");
+        programSlotDAO.update(toUpdate, toCreate.getDateOfProgram());
+    }
+
+    @Test
+    public void test12_update_withNullKeys_shouldThrowInvalidData() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
+        thrown.expect(InvalidDataException.class);
+        toUpdate.getRadioProgram().setName(null);
+        toUpdate.getPresenter().setId(null);
+        toUpdate.getProducer().setId(null);
+        toUpdate.setAssignedBy(null);
+        programSlotDAO.update(toUpdate, toCreate.getDateOfProgram());
+    }
+
+    @Test
+    public void test13_update_withNewPeriod_shouldUpdate() {
+        try {
+            programSlotDAO.update(toUpdate, toCreate.getDateOfProgram());
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void test14_update_withNotValidOrigin_shouldThrowNotFound() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException, SQLException {
+        thrown.expect(NotFoundException.class);
+        toUpdate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:20:00"));
+        programSlotDAO.update(toUpdate, toCreate.getDateOfProgram());
+    }
+
+    @Test
+    public void test16_delete_withNotValidOrigin_shouldThrowNotFound() throws NotFoundException, InUseException, SQLException {
+        thrown.expect(NotFoundException.class);
+        programSlotDAO.delete(toCreate.getDateOfProgram());
+    }
+
+    @Test
+    public void test17_delete_withValidOrigin_shouldDelete() {
+        try {
+            programSlotDAO.delete(toUpdate.getDateOfProgram());
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+}
