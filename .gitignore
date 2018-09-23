@@ -7,3 +7,7 @@ PRMS/nbbuild/
 PRMS/dist/
 PRMS/nbdist/
 PRMS/.nb-gradle/
+*.html
+/package-list
+/script.js
+/stylesheet.css
