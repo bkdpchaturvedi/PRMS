@@ -16,6 +16,13 @@ public class Error implements Serializable {
     private String description;
     private String error;
 
+    /**
+     * Get- and Set-methods for persistent variables. The default behaviour does
+     * not make any checks against malformed data, so these might require some
+     * manual additions.
+     *
+     * @return
+     */
     public String getDescription() {
         return description;
     }
@@ -24,6 +31,11 @@ public class Error implements Serializable {
         this.description = description;
     }
 
+    /**
+     * Constructors. The first one takes no arguments and provides the most
+     * simple way to create object instance. The another one takes arguments,
+     * which is the details attributes of the object instance.
+     */
     public String getError() {
         return error;
     }
@@ -32,9 +44,9 @@ public class Error implements Serializable {
         this.error = error;
     }
 
-    public Error(String description, String error) {
-        this.description = description;
+    public Error(String error, String description) {
         this.error = error;
+        this.description = description;
     }
 
 }

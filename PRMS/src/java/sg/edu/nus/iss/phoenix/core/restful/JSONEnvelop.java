@@ -16,6 +16,13 @@ public class JSONEnvelop<T extends Object> implements Serializable {
     private T data;
     private Error error;
 
+    /**
+     * Get- and Set-methods for persistent variables. The default behaviour does
+     * not make any checks against malformed data, so these might require some
+     * manual additions.
+     *
+     * @return
+     */
     public T getData() {
         return data;
     }
@@ -32,6 +39,11 @@ public class JSONEnvelop<T extends Object> implements Serializable {
         this.error = error;
     }
 
+    /**
+     * Constructors. The first one takes no arguments and provides the most
+     * simple way to create object instance. The another one takes arguments,
+     * which is the details attributes of the object instance.
+     */
     public JSONEnvelop() {
     }
 

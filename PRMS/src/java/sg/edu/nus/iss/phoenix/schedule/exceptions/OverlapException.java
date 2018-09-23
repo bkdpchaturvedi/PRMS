@@ -5,12 +5,10 @@
  */
 package sg.edu.nus.iss.phoenix.schedule.exceptions;
 
-import sg.edu.nus.iss.phoenix.core.exceptions.*;
-
 /**
- * DuplicateException exception. This exception will be thrown from ProgramSlot
+ * OverlapException exception. This exception will be thrown from ProgramSlot
  * DAO object when creating for new Program Slot if there is a Program Slot
- * record has existed between creating Program Slot date time and duration
+ * record has overlap date of program period
  *
  */
 /**
@@ -22,6 +20,7 @@ public class OverlapException extends Exception {
     /**
      * Constructor for DuplicateException. The input message is returned in
      * toString() message.
+     * @param message
      */
     public OverlapException(String message) {
         super(message);
