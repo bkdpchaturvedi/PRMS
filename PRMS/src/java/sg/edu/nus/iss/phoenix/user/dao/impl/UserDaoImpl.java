@@ -123,8 +123,13 @@ public class UserDaoImpl implements UserDao {
 			stmt.setString(1, valueObject.getId());
 			stmt.setString(2, valueObject.getPassword());
 			stmt.setString(3, valueObject.getName());
-			stmt.setString(4, valueObject.getRoles().get(0).getRole());
-
+			String roles = "";
+			for (Role role : valueObject.getRoles()) {
+				roles+= role.getRole()+":";
+			}
+			if (roles.length() > 0) {
+				stmt.setString(4, roles.substring(0, roles.length() - 1));
+			}
 			int rowcount = databaseUpdate(stmt);
 			if (rowcount != 1) {
 				// System.out.println("PrimaryKey Error when updating DB!");
