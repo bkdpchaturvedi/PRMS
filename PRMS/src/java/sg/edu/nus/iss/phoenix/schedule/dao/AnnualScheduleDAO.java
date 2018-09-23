@@ -54,12 +54,12 @@ public interface AnnualScheduleDAO {
      * what it was in the deleted object. If delete can not find matching row,
      * NotFoundException will be thrown.
      *
-     * @param input This parameter contains the class instance to be deleted.
+     * @param year This parameter contains the class instance to be deleted.
      * Primary-key field must be set for this to work properly.
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws java.sql.SQLException
      */
-    public abstract void delete(AnnualSchedule input)
+    public abstract void delete(Integer year)
             throws NotFoundException, SQLException;
     
     /**

@@ -222,9 +222,7 @@ public class ScheduleService {
                 for (int i = 1; i <= 52; i++) {
                     try {
                         DAOFactory.getWeeklyScheduleDAO().delete(
-                                new WeeklySchedule(
-                                        DateHelper.getWeekStartDate(dateOfProgram.toLocalDate(), i)
-                                )
+                                DateHelper.getWeekStartDate(dateOfProgram.toLocalDate(), i)
                         );
                     } catch (NotFoundException e) {
                         LOG.log(Level.INFO, e.getMessage());
@@ -232,7 +230,9 @@ public class ScheduleService {
                 }
                 
                 try {
-                    DAOFactory.getAnnualScheduleDAO().delete(new AnnualSchedule(DateHelper.getWeekYear(dateOfProgram.toLocalDate())));
+                    DAOFactory.getAnnualScheduleDAO().delete(
+                            DateHelper.getWeekYear(dateOfProgram.toLocalDate())
+                    );
                 } catch (NotFoundException e) {
                     LOG.log(Level.INFO, e.getMessage());
                 }

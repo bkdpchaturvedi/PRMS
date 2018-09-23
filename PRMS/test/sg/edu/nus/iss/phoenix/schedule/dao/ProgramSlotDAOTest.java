@@ -138,7 +138,7 @@ public class ProgramSlotDAOTest {
     }
     
     @Test
-    public void test08_load_withEsixtedDate_shouldFoundOne() {
+    public void test08_search_withEsixtedDate_shouldFoundOne() {
         try {
             List<ProgramSlot> result = programSlotDAO.search(new ProgramSlot(toCreate.getDateOfProgram()), ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
             assertEquals(1, result.size());
@@ -151,9 +151,8 @@ public class ProgramSlotDAOTest {
         }
     }
     
-    
     @Test
-    public void test09_load_withNonEsixtedDate_shouldFoundNone() {
+    public void test09_search_withNonEsixtedDate_shouldFoundNone() {
         try {;
             List<ProgramSlot> result = programSlotDAO.search(new ProgramSlot(LocalDateTime.parse("1999-12-31T23:55:00")), ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
             assertEquals(0, result.size());
@@ -161,15 +160,137 @@ public class ProgramSlotDAOTest {
             fail(ex.getMessage());
         }
     }
+    
+    @Test
+    public void test10_checkExisitCount_withDateRagePresenterProducerOpreatorOR_shouldFoundOne() {
+        try {
+            ProgramSlot searchProgramSlot = new ProgramSlot(toCreate.getDateOfProgram());
+            searchProgramSlot.setPresenter(toCreate.getPresenter());
+            searchProgramSlot.setProducer(toCreate.getPresenter());
+            Integer result = programSlotDAO.checkExistCount(searchProgramSlot, ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.OR);
+            assertTrue(1 == result);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void test11_checkExisitCount_withDateRagePresenterProducerOpreatorAND_shouldFoundNone() {
+        try {
+            ProgramSlot searchProgramSlot = new ProgramSlot(toCreate.getDateOfProgram());
+            searchProgramSlot.setPresenter(toCreate.getPresenter());
+            searchProgramSlot.setProducer(toCreate.getPresenter());
+            Integer result = programSlotDAO.checkExistCount(searchProgramSlot, ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
+            assertTrue(0 == result);
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void test12_checkOverlap_withExactDateOfProgram_shouldOverlap() throws SQLException {
+        try {
+            assertEquals(true, programSlotDAO.checkOverlap(toCreate));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+   @Test
+    public void test13_checkOverlap_withIntersetWithEndPeriod_shouldOverlap() throws SQLException {
+        try {
+            toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
+            assertEquals(true, programSlotDAO.checkOverlap(toCreate));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+   @Test
+    public void test14_checkOverlap_withIntersetWithFrontPeriod_shouldOverlap() throws SQLException {
+        try {
+            toCreate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:05:00"));
+            assertEquals(true, programSlotDAO.checkOverlap(toCreate));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void test15_checkOverlap_withIntersetWithWholePeriod_shouldOverlap() throws SQLException {
+        try {
+            toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
+        toCreate.setDuration(LocalTime.parse("00:20:00"));
+            assertEquals(true, programSlotDAO.checkOverlap(toCreate));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void test16_checkOverlap_withEarlierPeriod_shouldNotOverlap() throws SQLException {
+        try {
+            toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
+        toCreate.setDuration(LocalTime.parse("00:05:00"));
+            assertEquals(false, programSlotDAO.checkOverlap(toCreate));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+        
+    @Test
+    public void test17_checkOverlap_withLatererPeriod_shouldNotOverlap() throws SQLException {
+        try {
+            toCreate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:10:00"));
+        toCreate.setDuration(LocalTime.parse("00:05:00"));
+            assertEquals(false, programSlotDAO.checkOverlap(toCreate));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void test18_checkOverlap_withIntersetWithEndPeriodForSameOrigin_shouldNotOverlap() throws SQLException {
+        try {
+            LocalDateTime origin = toCreate.getDateOfProgram();
+            toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
+            assertEquals(false, programSlotDAO.checkOverlap(toCreate, origin));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+   @Test
+    public void test19_checkOverlap_withIntersetWithFrontPeriodForSameOrigin_shouldNotOverlap() throws SQLException {
+        try {
+            LocalDateTime origin = toCreate.getDateOfProgram();
+            toCreate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:05:00"));
+            assertEquals(false, programSlotDAO.checkOverlap(toCreate, origin));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void test20_checkOverlap_withIntersetWithWholePeriodForSameOrigin_shouldNotOverlap() throws SQLException {
+        try {
+            LocalDateTime origin = toCreate.getDateOfProgram();
+            toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
+        toCreate.setDuration(LocalTime.parse("00:20:00"));
+            assertEquals(false, programSlotDAO.checkOverlap(toCreate, origin));
+        } catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+    }
 
     @Test
-    public void test10_create_withExactDateOfProgram_shouldThrowDuplicate() throws DuplicateException, InvalidDataException, SQLException {
+    public void test21_create_withExactDateOfProgram_shouldThrowDuplicate() throws DuplicateException, InvalidDataException, SQLException {
         thrown.expect(DuplicateException.class);
         programSlotDAO.create(toCreate);
     }
 
     @Test
-    public void test11_update_withNotExistedKeys_shouldThrowInvalidData() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
+    public void test22_update_withNotExistedKeys_shouldThrowInvalidData() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
         thrown.expect(InvalidDataException.class);
         toUpdate.getRadioProgram().setName("spell");
         toUpdate.getPresenter().setId("wizard");
@@ -179,7 +300,7 @@ public class ProgramSlotDAOTest {
     }
 
     @Test
-    public void test12_update_withNullKeys_shouldThrowInvalidData() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
+    public void test23_update_withNullKeys_shouldThrowInvalidData() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
         thrown.expect(InvalidDataException.class);
         toUpdate.getRadioProgram().setName(null);
         toUpdate.getPresenter().setId(null);
@@ -189,7 +310,7 @@ public class ProgramSlotDAOTest {
     }
 
     @Test
-    public void test13_update_withNewPeriod_shouldUpdate() {
+    public void test24_update_withNewPeriod_shouldUpdate() {
         try {
             programSlotDAO.update(toUpdate, toCreate.getDateOfProgram());
         } catch (Exception ex) {
@@ -198,20 +319,20 @@ public class ProgramSlotDAOTest {
     }
 
     @Test
-    public void test14_update_withNotValidOrigin_shouldThrowNotFound() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException, SQLException {
+    public void test25_update_withNotValidOrigin_shouldThrowNotFound() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException, SQLException {
         thrown.expect(NotFoundException.class);
         toUpdate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:20:00"));
         programSlotDAO.update(toUpdate, toCreate.getDateOfProgram());
     }
 
     @Test
-    public void test16_delete_withNotValidOrigin_shouldThrowNotFound() throws NotFoundException, InUseException, SQLException {
+    public void test26_delete_withNotValidOrigin_shouldThrowNotFound() throws NotFoundException, InUseException, SQLException {
         thrown.expect(NotFoundException.class);
         programSlotDAO.delete(toCreate.getDateOfProgram());
     }
 
     @Test
-    public void test17_delete_withValidOrigin_shouldDelete() {
+    public void test27_delete_withValidOrigin_shouldDelete() {
         try {
             programSlotDAO.delete(toUpdate.getDateOfProgram());
         } catch (Exception ex) {

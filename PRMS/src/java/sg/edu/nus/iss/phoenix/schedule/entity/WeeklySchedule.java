@@ -47,11 +47,11 @@ public class WeeklySchedule implements Serializable, Cloneable {
      * so these might require some manual additions.
      * @return 
      */
-    public LocalDate getSartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setSartDate(LocalDate startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
@@ -61,6 +61,19 @@ public class WeeklySchedule implements Serializable, Cloneable {
 
     public void setAssignedBy(String assignedBy) {
         this.assignedBy = assignedBy;
+    }
+    /**
+     * appointAll allows to set all persistent variables in one method call. This is
+     * useful, when all data is available and it is needed to set the initial
+     * state of this object. Note that this method will directly modify instance
+     * variables, without going trough the individual set-methods.
+     *
+     * @param year
+     * @param assignedBy
+     */
+    public void appointAll(LocalDate staDate, String assignedBy) {
+        this.startDate = startDate;
+        this.assignedBy  = assignedBy;
     }
     
     /** 
@@ -74,9 +87,9 @@ public class WeeklySchedule implements Serializable, Cloneable {
      */
     public boolean hasEqualMapping(WeeklySchedule valueObject) {
         if (this.startDate == null) {
-            if (valueObject.getSartDate()!= null)
+            if (valueObject.getStartDate()!= null)
                 return(false);
-        } else if (!this.startDate.equals(valueObject.getSartDate())) {
+        } else if (!this.startDate.equals(valueObject.getStartDate())) {
             return(false);
         }
         if (this.assignedBy == null) {
@@ -117,10 +130,9 @@ public class WeeklySchedule implements Serializable, Cloneable {
          WeeklySchedule cloned = new WeeklySchedule();
 
         if (this.startDate != null)
-             cloned.setSartDate(this.startDate); 
+             cloned.setStartDate(this.startDate); 
         if (this.assignedBy != null)
              cloned.setAssignedBy(this.assignedBy); 
         return cloned;
     }
-
 }

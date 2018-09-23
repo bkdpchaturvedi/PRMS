@@ -158,7 +158,7 @@ public class UserRESTService {
     /**
      * PUT method for updating or creating an instance of resource
      *
-     * @param content representation for the resource
+     * @param input
      */
     @PUT
     @Path("/update")

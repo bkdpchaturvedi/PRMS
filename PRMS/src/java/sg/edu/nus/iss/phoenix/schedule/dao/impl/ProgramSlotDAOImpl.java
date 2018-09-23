@@ -48,7 +48,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
         try {
             Integer rowcount = 0;
             String sql = "SELECT COUNT(*) FROM `phoenix`.`program-slot`";
-            filterQueryBuilder(input, filter, opreation);
+            sql += filterQueryBuilder(input, filter, opreation);
             ResultSet resultSet = databaseQuery(connection.prepareStatement(sql));
             if (resultSet.next()) {
                 rowcount = resultSet.getInt(1);
@@ -181,6 +181,9 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
 
     @Override
     public void load(ProgramSlot input) throws SQLException, NotFoundException {
+        if (input.getDateOfProgram() == null) {
+            throw new NotFoundException("Can not select without Primary-Key!");
+        }
         try {
             openConnection();
             String sql = "SELECT * FROM `phoenix`.`program-slot` WHERE dateOfProgram = '" + input.getDateOfProgram() + "'";
@@ -288,10 +291,6 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
         
         if (input.getDateOfProgram() != null) {
             switch (filter) {
-                case BY_FUTURE:
-                    sql += queryOpreation + " (DateOfProgram >= '" + LocalDateTime.now()
-                            + "')";
-                    break;
                 case BY_YEAR:
                     sql += queryOpreation + " (dateOfProgram >= '"
                             + DateHelper.getWeekStartDate(
@@ -328,17 +327,24 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
                                     .truncatedTo(ChronoUnit.HOURS)
                                     .plusHours(1) + "')";
             }
+        } else {
+            switch (filter) {
+                case BY_FUTURE:
+                    sql += queryOpreation + " (DateOfProgram >= '" + LocalDateTime.now()
+                            + "')";
+                    break;
+            }
         }
         if (input.getRadioProgram() != null) {
             sql += queryOpreation + " (program-name = '"
                     + input.getRadioProgram().getName() + "')";
         }
         if (input.getPresenter() != null) {
-            sql += queryOpreation + " AND (presenter = '"
+            sql += queryOpreation + " (presenter = '"
                     + input.getPresenter().getId() + "')";
         }
         if (input.getProducer() != null) {
-            sql += queryOpreation + " AND (presenter = '"
+            sql += queryOpreation + " (producer = '"
                     + input.getProducer().getId() + "')";
         }
         if (sql != "") {

@@ -26,20 +26,43 @@ public interface ProgramSlotDAO {
      * program field searching.
      */
     static enum DateRangeFilter {
+
+        /**
+         * Date time must be larger than current date time
+         */
         BY_FUTURE,
+        /**
+         * Date time must be same ISO week based year
+         */
         BY_YEAR,
+        /**
+         * Date time must be ISO same week
+         */
         BY_WEEK,
+        /**
+         * Date time must be same date
+         */
         BY_DATE,
+        /**
+         * Date time must be same hour of same date
+         */
         BY_HOUR
     }
 
     /**
-     * DateRangeFilter. This to be used as flag parameter in the searching
+     * FieldsOpreation. This to be used as flag parameter in the searching
      * methods like search method and checkExistCount regarding about operation
      * of the each other fields.
      */
     static enum FieldsOpreation {
+
+        /**
+         * AND operation for in between fields query
+         */
         AND,
+        /**
+         * OR operation for in between fields query
+         */
         OR
     }
 
@@ -64,9 +87,9 @@ public interface ProgramSlotDAO {
      * @return boolean
      * @throws java.sql.SQLException
      */
-    public abstract Integer checkExistCount(ProgramSlot input
-            , DateRangeFilter filter
-            , FieldsOpreation opreation) 
+    public abstract Integer checkExistCount(ProgramSlot input,
+            DateRangeFilter filter,
+            FieldsOpreation opreation)
             throws SQLException;
 
     /**
@@ -120,7 +143,8 @@ public interface ProgramSlotDAO {
      * what it was in the deleted object. If delete can not find matching row,
      * NotFoundException will be thrown.
      *
-     * @param dateOfProgram
+     * @param dateOfProgram his parameter contains the class instance to be
+     * deleted.
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.InUseException
      * @throws java.sql.SQLException
@@ -189,25 +213,11 @@ public interface ProgramSlotDAO {
      * @return list of the class instance
      * @throws java.sql.SQLException
      */
-    public abstract List<ProgramSlot> search(ProgramSlot input
-            , DateRangeFilter filter
-            , FieldsOpreation opreation)
+    public abstract List<ProgramSlot> search(ProgramSlot input,
+            DateRangeFilter filter,
+            FieldsOpreation opreation)
             throws SQLException;
-
-//    /**
-//     * search-Method. This method provides searching capability to get matching
-//     * valueObjects from database. It works by searching all objects that match
-//     * permanent instance variables of given object. The
-//     * result will be 0-N objects in a List, all matching those criteria you
-//     * specified. Those instance-variables that have NULL values are excluded in
-//     * search-criteria.
-//     *
-//     * @param year
-//     * @return list of the class instance
-//     * @throws java.sql.SQLException
-//     */
-//    public abstract List<ProgramSlot> search(Integer year)
-//            throws SQLException;
+    
     /**
      * update-method. This method will save the current state of input to
      * database. Save can not be used to create new instances in database, so
