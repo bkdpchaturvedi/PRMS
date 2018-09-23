@@ -86,6 +86,54 @@ public class UserRESTService {
         // throw new UnsupportedOperationException();
     }
 
+     /**
+     * Retrieves representation of all instances of resource
+     *
+     * @return an instance of JSONEnvelop of presenter array list  
+     */
+    @GET
+    @Path("/presenters")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JSONEnvelop<List<User>> getAllPresenters() {
+
+        JSONEnvelop<List<User>> result;
+        result = new JSONEnvelop<>();
+
+        try {
+            result.setData(service.findAllPresenters());
+        } catch (Exception ex) {
+            result.setError(new sg.edu.nus.iss.phoenix.core.restful.Error("Error while Retrieving presenters ", ex.getMessage()));
+        }
+
+        //TODO return proper representation object
+        return result;
+        // throw new UnsupportedOperationException();
+    }
+    
+     /**
+     * Retrieves representation of all instances of resource
+     *
+     * @return an instance of JSONEnvelop of producer array list 
+     */
+    @GET
+    @Path("/producers")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JSONEnvelop<List<User>> getAllProducers() {
+
+        JSONEnvelop<List<User>> result;
+        result = new JSONEnvelop<>();
+
+        try {
+            result.setData(service.findAllProducers());
+        } catch (Exception ex) {
+            result.setError(new sg.edu.nus.iss.phoenix.core.restful.Error("Error while Retrieving producers ", ex.getMessage()));
+        }
+
+        //TODO return proper representation object
+        return result;
+        // throw new UnsupportedOperationException();
+    }
+    
     /**
      * POST method for creating an instance of resource
      *
