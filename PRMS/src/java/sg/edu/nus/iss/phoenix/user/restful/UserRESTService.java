@@ -39,10 +39,9 @@ public class UserRESTService {
      * Creates a new instance of UserRESTService
      */
     public UserRESTService() {
-        service=new UserService();
+        service = new UserService();
     }
-    
-    
+
     /**
      * Retrieves representation of an instance of resource
      *
@@ -50,14 +49,20 @@ public class UserRESTService {
      * @return an instance of JSONEnvelop of User
      */
     @GET
-    @Path("/{id}")
+    @Path("/getbyid/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public JSONEnvelop<User> getUser(@PathParam("id") String id) {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+        JSONEnvelop<User> result = new JSONEnvelop<User>();
+        try {
+            result.setData(service.getUserById(id));
+        } catch (Exception ex) {
+            result.setError(new sg.edu.nus.iss.phoenix.core.restful.Error("Error while Retrieving users ", ex.getMessage()));
+        }
+
+        return result;
     }
-  
-     /**
+
+    /**
      * Retrieves representation of all instances of resource
      *
      * @return an instance of JSONEnvelop of user array list
@@ -73,7 +78,6 @@ public class UserRESTService {
         try {
             result.setData(service.getAllUsers());
         } catch (Exception ex) {
-
             result.setError(new sg.edu.nus.iss.phoenix.core.restful.Error("Error while Retrieving users ", ex.getMessage()));
         }
 
@@ -82,6 +86,54 @@ public class UserRESTService {
         // throw new UnsupportedOperationException();
     }
 
+     /**
+     * Retrieves representation of all instances of resource
+     *
+     * @return an instance of JSONEnvelop of presenter array list  
+     */
+    @GET
+    @Path("/presenters")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JSONEnvelop<List<User>> getAllPresenters() {
+
+        JSONEnvelop<List<User>> result;
+        result = new JSONEnvelop<>();
+
+        try {
+            result.setData(service.findAllPresenters());
+        } catch (Exception ex) {
+            result.setError(new sg.edu.nus.iss.phoenix.core.restful.Error("Error while Retrieving presenters ", ex.getMessage()));
+        }
+
+        //TODO return proper representation object
+        return result;
+        // throw new UnsupportedOperationException();
+    }
+    
+     /**
+     * Retrieves representation of all instances of resource
+     *
+     * @return an instance of JSONEnvelop of producer array list 
+     */
+    @GET
+    @Path("/producers")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JSONEnvelop<List<User>> getAllProducers() {
+
+        JSONEnvelop<List<User>> result;
+        result = new JSONEnvelop<>();
+
+        try {
+            result.setData(service.findAllProducers());
+        } catch (Exception ex) {
+            result.setError(new sg.edu.nus.iss.phoenix.core.restful.Error("Error while Retrieving producers ", ex.getMessage()));
+        }
+
+        //TODO return proper representation object
+        return result;
+        // throw new UnsupportedOperationException();
+    }
+    
     /**
      * POST method for creating an instance of resource
      *
@@ -91,8 +143,14 @@ public class UserRESTService {
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
     public JSONEnvelop<Boolean> creaeUser(User input) {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+        JSONEnvelop<Boolean> result = new JSONEnvelop<Boolean>();
+        try {
+            result.setData(service.createUser(input));
+        } catch (Exception ex) {
+            result.setError(new sg.edu.nus.iss.phoenix.core.restful.Error("Error while Creating users ", ex.getMessage()));
+        }
+
+        return result;
     }
 
     /**
@@ -104,8 +162,14 @@ public class UserRESTService {
     @Path("/update")
     @Consumes(MediaType.APPLICATION_JSON)
     public JSONEnvelop<Boolean> updateUser(User input) {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+        JSONEnvelop<Boolean> result = new JSONEnvelop<Boolean>();
+        try {
+            result.setData(service.updateUser(input));
+        } catch (Exception ex) {
+            result.setError(new sg.edu.nus.iss.phoenix.core.restful.Error("Error while Updating users ", ex.getMessage()));
+        }
+
+        return result;
     }
 
     /**
@@ -114,12 +178,18 @@ public class UserRESTService {
      * @param id unique identifier for user
      */
     @DELETE
-    @Path("/delete/{id}")
+    @Path("/deletebyid/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public JSONEnvelop<Boolean> deleteUser(
             @PathParam("id") String id
     ) {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
+      JSONEnvelop<Boolean> result = new JSONEnvelop<Boolean>();
+        try {
+            result.setData(service.deleteUser(id));
+        } catch (Exception ex) {
+            result.setError(new sg.edu.nus.iss.phoenix.core.restful.Error("Error while Deleting users ", ex.getMessage()));
+        }
+
+        return result;
     }
 }

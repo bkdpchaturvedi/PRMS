@@ -54,7 +54,7 @@ public class UserService {
      *
      * @param input
      */
-    public void createUser(User input) {
+    public Boolean createUser(User input) {
         throw new UnsupportedOperationException();
 
     }
@@ -63,7 +63,7 @@ public class UserService {
      *
      * @param input
      */
-    public void updateUser(User input) {
+    public Boolean updateUser(User input) {
         throw new UnsupportedOperationException();
 
     }
@@ -72,7 +72,7 @@ public class UserService {
      *
      * @param input
      */
-    public void deleteUser(String id) {
+    public Boolean deleteUser(String id) {
         throw new UnsupportedOperationException();
 
     }
@@ -121,4 +121,7 @@ public class UserService {
         throw new UnsupportedOperationException();
     }
 
+    public User getUserById(String Id) {
+        throw new UnsupportedOperationException();
+    }
 }

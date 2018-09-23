@@ -27,6 +27,7 @@ public class UserDaoImpl implements UserDao {
 	private static final Logger logger = Logger.getLogger(UserDaoImpl.class.getName());
 
 	Connection connection;
+	private Role role;
 
 
 	public UserDaoImpl() {
@@ -330,6 +331,23 @@ public class UserDaoImpl implements UserDao {
 			searchResults = listQuery(this.connection.prepareStatement(sql
 					.toString()));
 
+		return searchResults;
+	}
+
+	/**
+	 * getUsersByRole-method . This method will take a Role as an input parammeter
+	 * and retrieve the corresponding users from the DB with the specific Role
+	 * @param role
+	 * @return
+	 * @throws SQLException
+	 */
+	@Override
+	public List<User> getUsersByRole(Role role) throws SQLException {
+		List<User> searchResults;
+		StringBuffer sql = new StringBuffer("SELECT * FROM user WHERE ROLE = ");
+		sql.append(role.getRole());
+		searchResults = listQuery(this.connection.prepareStatement(sql
+				.toString()));
 		return searchResults;
 	}
 
