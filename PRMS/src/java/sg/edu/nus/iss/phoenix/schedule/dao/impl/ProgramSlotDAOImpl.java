@@ -210,7 +210,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
         List<ProgramSlot> result = new ArrayList<>();
         try {
             openConnection();
-            String sql = "SELECT * FROM `phoenix`.`program-slot` WHERE 1 = 1";
+            String sql = "SELECT * FROM `phoenix`.`program-slot`";
             sql += filterQueryBuilder(input, filter, opreation);
             sql += " ORDER BY `dateOfProgram` ASC";
             result = listQuery(connection.prepareStatement(sql));
