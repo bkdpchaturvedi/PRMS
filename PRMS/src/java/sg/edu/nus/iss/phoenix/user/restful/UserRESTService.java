@@ -29,7 +29,7 @@ import sg.edu.nus.iss.phoenix.user.service.UserService;
  *
  * @author chaturbkdp
  */
-@Path("User")
+@Path("user")
 @RequestScoped
 public class UserRESTService {
 
