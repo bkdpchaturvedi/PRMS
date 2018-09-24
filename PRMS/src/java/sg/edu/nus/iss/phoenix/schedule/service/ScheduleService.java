@@ -113,6 +113,7 @@ public class ScheduleService {
             result = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
                     .loadAll();
             for (ProgramSlot programSlot : result) {
+                DAOFactory.getProgramDAO().load(programSlot.getRadioProgram());
                 DAOFactory.getUserDAO().load(programSlot.getPresenter());
                 DAOFactory.getUserDAO().load(programSlot.getProducer());
             }
