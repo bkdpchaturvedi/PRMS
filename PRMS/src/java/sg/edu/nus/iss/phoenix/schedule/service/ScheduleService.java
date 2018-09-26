@@ -6,7 +6,7 @@
 package sg.edu.nus.iss.phoenix.schedule.service;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class ScheduleService {
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.InUseException
      */
-    public void deleteProgramSlot(LocalDateTime dateOfProgram) throws NotFoundException, InUseException {
+    public void deleteProgramSlot(ZonedDateTime dateOfProgram) throws NotFoundException, InUseException {
          try {
             DAOFactory.getProgramSlotDAO().delete(dateOfProgram);
             depopulateSchedule(dateOfProgram);
@@ -81,7 +81,7 @@ public class ScheduleService {
      * @param dateOfProgram
      * @return
      */
-    public List<ProgramSlot> findProgramSlots(LocalDateTime dateOfProgram) {
+    public List<ProgramSlot> findProgramSlots(ZonedDateTime dateOfProgram) {
         ArrayList<ProgramSlot> result = new ArrayList<ProgramSlot>();
         try {
             ProgramSlot input = DAOFactory.getProgramSlotDAO().createValueObject();
@@ -131,7 +131,7 @@ public class ScheduleService {
      * @param dateOfProgram
      * @return
      */
-    public ProgramSlot getProgramSlot(LocalDateTime dateOfProgram) throws NotFoundException {
+    public ProgramSlot getProgramSlot(ZonedDateTime dateOfProgram) throws NotFoundException {
         try {
             ProgramSlot result = DAOFactory.getProgramSlotDAO().get(dateOfProgram);
             DAOFactory.getUserDAO().load(result.getPresenter());
@@ -155,7 +155,7 @@ public class ScheduleService {
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws sg.edu.nus.iss.phoenix.schedule.exceptions.OverlapException
      */
-    public void updateProgramSlot(ProgramSlot input, LocalDateTime origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
+    public void updateProgramSlot(ProgramSlot input, ZonedDateTime origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
         try {
             populateSchedule(input);
             if (DAOFactory.getProgramSlotDAO().checkOverlap(input, origin)) {
@@ -213,7 +213,7 @@ public class ScheduleService {
      * @param input
      * @throws SQLException
      */
-    private void depopulateSchedule(LocalDateTime dateOfProgram) {
+    private void depopulateSchedule(ZonedDateTime dateOfProgram) {
         try {
             Integer count = DAOFactory.getProgramSlotDAO().checkExistCount(
                     new ProgramSlot(dateOfProgram)

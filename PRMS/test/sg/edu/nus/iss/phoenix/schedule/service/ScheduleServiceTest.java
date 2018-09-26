@@ -5,7 +5,8 @@
  */
 package sg.edu.nus.iss.phoenix.schedule.service;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.time.LocalTime;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -53,8 +54,10 @@ public class ScheduleServiceTest {
 
     @Before
     public void setUp() {
-        toCreate = new ProgramSlot(LocalDateTime.parse("2000-01-01T00:00:00"), LocalTime.parse("00:10:00"), "news", "dilbert", "wally", "pointyhead");
-        toUpdate = new ProgramSlot(LocalDateTime.parse("2000-01-01T00:05:00"), LocalTime.parse("00:15:00"), "news", "dilbert", "dogbert", "catbert");
+        toCreate = new ProgramSlot();
+        toCreate.appointAll(ZonedDateTime.parse("2000-01-01T00:00:00Z"), Duration.ofMinutes(10), "news", "dilbert", "wally", "pointyhead");
+        toUpdate = new ProgramSlot();
+        toCreate.appointAll(ZonedDateTime.parse("2000-01-01T00:05:00Z"), Duration.ofMinutes(15), "news", "dilbert", "dogbert", "catbert");
     }
 
     @After
@@ -100,22 +103,22 @@ public class ScheduleServiceTest {
 
     @Test
     public void test05_createProgramSlot_withIntersetWithEndPeriod_shouldThrowOverlap() throws OverlapException, DuplicateException, InvalidDataException {
-        toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
+        toCreate.setDateOfProgram(ZonedDateTime.parse("1999-12-31T23:55:00Z"));
         thrown.expect(OverlapException.class);
         service.createProgramSlot(toCreate);
     }
 
     @Test
     public void test06_createProgramSlot_withIntersetWithFrontPeriod_shouldThrowOverlap() throws OverlapException, DuplicateException, InvalidDataException {
-        toCreate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:05:00"));
+        toCreate.setDateOfProgram(ZonedDateTime.parse("2000-01-01T00:05:00Z"));
         thrown.expect(OverlapException.class);
         service.createProgramSlot(toCreate);
     }
 
     @Test
     public void test07_createProgramSlot_withIntersetWithWholePeriod_shouldThrowOverlap() throws OverlapException, DuplicateException, InvalidDataException {
-        toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
-        toCreate.setDuration(LocalTime.parse("00:20:00"));
+        toCreate.setDateOfProgram(ZonedDateTime.parse("1999-12-31T23:55:00Z"));
+        toCreate.setDuration(Duration.ofMinutes(20));
         thrown.expect(OverlapException.class);
         service.createProgramSlot(toCreate);
     }
@@ -152,7 +155,7 @@ public class ScheduleServiceTest {
     @Test
     public void test11_updateProgramSlot_withNotValidOrigin_shouldThrowNotFound() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
         thrown.expect(NotFoundException.class);
-        toUpdate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:20:00"));
+        toUpdate.setDateOfProgram(ZonedDateTime.parse("2000-01-01T00:20:00Z"));
         service.updateProgramSlot(toUpdate, toCreate.getDateOfProgram());
     }
 

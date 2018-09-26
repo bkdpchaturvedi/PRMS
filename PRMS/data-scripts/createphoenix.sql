@@ -116,7 +116,7 @@ DROP TABLE IF EXISTS `phoenix`.`program-slot` ;
 
 CREATE  TABLE IF NOT EXISTS `phoenix`.`program-slot` (
   `dateOfProgram` DATETIME NOT NULL ,
-  `duration` TIME NOT NULL ,
+  `duration` INT NOT NULL ,
   `program-name` VARCHAR(45) NOT NULL ,
   `presenter` VARCHAR(40) NOT NULL,
   `producer` VARCHAR(40) NOT NULL,

@@ -68,7 +68,7 @@ public class WeeklySchedule implements Serializable, Cloneable {
      * state of this object. Note that this method will directly modify instance
      * variables, without going trough the individual set-methods.
      *
-     * @param year
+     * @param staDate
      * @param assignedBy
      */
     public void appointAll(LocalDate staDate, String assignedBy) {

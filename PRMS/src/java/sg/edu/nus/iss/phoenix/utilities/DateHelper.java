@@ -7,7 +7,6 @@ package sg.edu.nus.iss.phoenix.utilities;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -61,14 +60,13 @@ public class DateHelper {
         return input.get(WeekFields.ISO.weekBasedYear());
     }
     
-    public static LocalDateTime getUTC(String input) {
+    public static ZonedDateTime getUTC(String input) {
         return getUTC(input, null);
     }
     
-    public static LocalDateTime getUTC(String input, ChronoUnit truncate)  {
+    public static ZonedDateTime getUTC(String input, ChronoUnit truncate)  {
         return ZonedDateTime.parse(input, DateTimeFormatter.ISO_DATE_TIME)
                 .truncatedTo(truncate)
-                .withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+                .withZoneSameInstant(ZoneOffset.UTC);
     }
-
 }

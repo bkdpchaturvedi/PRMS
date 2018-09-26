@@ -6,7 +6,7 @@
 package sg.edu.nus.iss.phoenix.schedule.dao;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
 import sg.edu.nus.iss.phoenix.core.exceptions.InUseException;
@@ -114,7 +114,7 @@ public interface ProgramSlotDAO {
      * @return boolean
      * @throws java.sql.SQLException
      */
-    public abstract Boolean checkOverlap(ProgramSlot input, LocalDateTime origin) throws SQLException;
+    public abstract Boolean checkOverlap(ProgramSlot input, ZonedDateTime origin) throws SQLException;
 
     /**
      * create-method. This will create new row in database according to supplied
@@ -149,7 +149,7 @@ public interface ProgramSlotDAO {
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.InUseException
      * @throws java.sql.SQLException
      */
-    public abstract void delete(LocalDateTime dateOfProgram)
+    public abstract void delete(ZonedDateTime dateOfProgram)
             throws NotFoundException, InUseException, SQLException;
 
     /**
@@ -164,7 +164,7 @@ public interface ProgramSlotDAO {
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws java.sql.SQLException
      */
-    public abstract ProgramSlot get(LocalDateTime dateOfProgram)
+    public abstract ProgramSlot get(ZonedDateTime dateOfProgram)
             throws SQLException, NotFoundException;
 
     /**
@@ -235,6 +235,6 @@ public interface ProgramSlotDAO {
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException
      * @throws java.sql.SQLException
      */
-    public abstract void update(ProgramSlot input, LocalDateTime origin)
+    public abstract void update(ProgramSlot input, ZonedDateTime origin)
             throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException;
 }

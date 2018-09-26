@@ -7,7 +7,8 @@
 package sg.edu.nus.iss.phoenix.schedule.dao;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.After;
@@ -57,8 +58,10 @@ public class ProgramSlotDAOTest {
 
     @Before
     public void setUp() {
-        toCreate = new ProgramSlot(LocalDateTime.parse("2000-01-01T00:00:00"), LocalTime.parse("00:10:00"), "news", "dilbert", "wally", "pointyhead");
-        toUpdate = new ProgramSlot(LocalDateTime.parse("2000-01-01T00:05:00"), LocalTime.parse("00:15:00"), "news", "dilbert", "dogbert", "catbert");
+        toCreate = new ProgramSlot();
+        toCreate.appointAll(ZonedDateTime.parse("2000-01-01T00:00:00Z"), Duration.ofMinutes(10), "news", "dilbert", "wally", "pointyhead");
+        toUpdate = new ProgramSlot();
+        toCreate.appointAll(ZonedDateTime.parse("2000-01-01T00:05:00Z"), Duration.ofMinutes(15), "news", "dilbert", "dogbert", "catbert");
     }
 
     @After
@@ -154,7 +157,7 @@ public class ProgramSlotDAOTest {
     @Test
     public void test09_search_withNonEsixtedDate_shouldFoundNone() {
         try {;
-            List<ProgramSlot> result = programSlotDAO.search(new ProgramSlot(LocalDateTime.parse("1999-12-31T23:55:00")), ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
+            List<ProgramSlot> result = programSlotDAO.search(new ProgramSlot(ZonedDateTime.parse("1999-12-31T23:55:00Z")), ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
             assertEquals(0, result.size());
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -199,7 +202,7 @@ public class ProgramSlotDAOTest {
    @Test
     public void test13_checkOverlap_withIntersetWithEndPeriod_shouldOverlap() throws SQLException {
         try {
-            toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
+            toCreate.setDateOfProgram(ZonedDateTime.parse("1999-12-31T23:55:00Z"));
             assertEquals(true, programSlotDAO.checkOverlap(toCreate));
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -209,7 +212,7 @@ public class ProgramSlotDAOTest {
    @Test
     public void test14_checkOverlap_withIntersetWithFrontPeriod_shouldOverlap() throws SQLException {
         try {
-            toCreate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:05:00"));
+            toCreate.setDateOfProgram(ZonedDateTime.parse("2000-01-01T00:05:00Z"));
             assertEquals(true, programSlotDAO.checkOverlap(toCreate));
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -219,8 +222,8 @@ public class ProgramSlotDAOTest {
     @Test
     public void test15_checkOverlap_withIntersetWithWholePeriod_shouldOverlap() throws SQLException {
         try {
-            toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
-        toCreate.setDuration(LocalTime.parse("00:20:00"));
+            toCreate.setDateOfProgram(ZonedDateTime.parse("1999-12-31T23:55:00Z"));
+        toCreate.setDuration(Duration.ofMinutes(20));
             assertEquals(true, programSlotDAO.checkOverlap(toCreate));
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -230,8 +233,8 @@ public class ProgramSlotDAOTest {
     @Test
     public void test16_checkOverlap_withEarlierPeriod_shouldNotOverlap() throws SQLException {
         try {
-            toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
-        toCreate.setDuration(LocalTime.parse("00:05:00"));
+            toCreate.setDateOfProgram(ZonedDateTime.parse("1999-12-31T23:55:00Z"));
+        toCreate.setDuration(Duration.ofMinutes(5));
             assertEquals(false, programSlotDAO.checkOverlap(toCreate));
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -241,8 +244,8 @@ public class ProgramSlotDAOTest {
     @Test
     public void test17_checkOverlap_withLatererPeriod_shouldNotOverlap() throws SQLException {
         try {
-            toCreate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:10:00"));
-        toCreate.setDuration(LocalTime.parse("00:05:00"));
+            toCreate.setDateOfProgram(ZonedDateTime.parse("2000-01-01T00:10:00Z"));
+        toCreate.setDuration(Duration.ofMinutes(5));
             assertEquals(false, programSlotDAO.checkOverlap(toCreate));
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -252,8 +255,8 @@ public class ProgramSlotDAOTest {
     @Test
     public void test18_checkOverlap_withIntersetWithEndPeriodForSameOrigin_shouldNotOverlap() throws SQLException {
         try {
-            LocalDateTime origin = toCreate.getDateOfProgram();
-            toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
+            ZonedDateTime origin = toCreate.getDateOfProgram();
+            toCreate.setDateOfProgram(ZonedDateTime.parse("1999-12-31T23:55:00Z"));
             assertEquals(false, programSlotDAO.checkOverlap(toCreate, origin));
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -263,8 +266,8 @@ public class ProgramSlotDAOTest {
    @Test
     public void test19_checkOverlap_withIntersetWithFrontPeriodForSameOrigin_shouldNotOverlap() throws SQLException {
         try {
-            LocalDateTime origin = toCreate.getDateOfProgram();
-            toCreate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:05:00"));
+            ZonedDateTime origin = toCreate.getDateOfProgram();
+            toCreate.setDateOfProgram(ZonedDateTime.parse("2000-01-01T00:05:00Z"));
             assertEquals(false, programSlotDAO.checkOverlap(toCreate, origin));
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -274,9 +277,9 @@ public class ProgramSlotDAOTest {
     @Test
     public void test20_checkOverlap_withIntersetWithWholePeriodForSameOrigin_shouldNotOverlap() throws SQLException {
         try {
-            LocalDateTime origin = toCreate.getDateOfProgram();
-            toCreate.setDateOfProgram(LocalDateTime.parse("1999-12-31T23:55:00"));
-        toCreate.setDuration(LocalTime.parse("00:20:00"));
+            ZonedDateTime origin = toCreate.getDateOfProgram();
+            toCreate.setDateOfProgram(ZonedDateTime.parse("1999-12-31T23:55:00Z"));
+        toCreate.setDuration(Duration.ofMinutes(20));
             assertEquals(false, programSlotDAO.checkOverlap(toCreate, origin));
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -321,7 +324,7 @@ public class ProgramSlotDAOTest {
     @Test
     public void test25_update_withNotValidOrigin_shouldThrowNotFound() throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException, SQLException {
         thrown.expect(NotFoundException.class);
-        toUpdate.setDateOfProgram(LocalDateTime.parse("2000-01-01T00:20:00"));
+        toUpdate.setDateOfProgram(ZonedDateTime.parse("2000-01-01T00:20:00Z"));
         programSlotDAO.update(toUpdate, toCreate.getDateOfProgram());
     }
 

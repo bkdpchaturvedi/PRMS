@@ -10,7 +10,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,32 +68,32 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
     }
 
     @Override
-    public Boolean checkOverlap(ProgramSlot input, LocalDateTime origin) throws SQLException {
-        LocalDateTime programSlotStarts = input.getDateOfProgram();
-        LocalDateTime programSlotEnds = input.getDateOfProgram()
-                .plusSeconds(input.getDuration().toSecondOfDay());
+    public Boolean checkOverlap(ProgramSlot input, ZonedDateTime origin) throws SQLException {
+        ZonedDateTime programSlotStarts = input.getDateOfProgram();
+        ZonedDateTime programSlotEnds = input.getDateOfProgram()
+                .plusSeconds(input.getDuration().getSeconds());
         PreparedStatement preparedStatement = null;
         openConnection();
         try {
             Integer rowcount = 0;
             String sql = "SELECT COUNT(*) FROM `phoenix`.`program-slot`"
                     + " WHERE ((DateOfProgram >= ? AND DateOfProgram < ?)"
-                    + " OR (ADDTIME(DateOfProgram, duration) > ?"
-                    + " AND ADDTIME(DateOfProgram, duration) < ?)"
+                    + " OR (DATE_ADD(dateOfProgram, INTERVAL duration SECOND) > ?"
+                    + " AND DATE_ADD(dateOfProgram, INTERVAL duration SECOND) < ?)"
                     + " OR (DateOfProgram < ?"
-                    + " AND ADDTIME(DateOfProgram, duration) > ?))";
+                    + " AND DATE_ADD(dateOfProgram, INTERVAL duration SECOND) > ?))";
             if (origin != null) {
                 sql += " AND DateOfProgram <> ?";
             }
             preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setTimestamp(1, Timestamp.valueOf(programSlotStarts));
-            preparedStatement.setTimestamp(2, Timestamp.valueOf(programSlotEnds));
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(programSlotStarts));
-            preparedStatement.setTimestamp(4, Timestamp.valueOf(programSlotEnds));
-            preparedStatement.setTimestamp(5, Timestamp.valueOf(programSlotStarts));
-            preparedStatement.setTimestamp(6, Timestamp.valueOf(programSlotEnds));
+            preparedStatement.setTimestamp(1, Timestamp.valueOf(programSlotStarts.toLocalDateTime()));
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(programSlotEnds.toLocalDateTime()));
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(programSlotStarts.toLocalDateTime()));
+            preparedStatement.setTimestamp(4, Timestamp.valueOf(programSlotEnds.toLocalDateTime()));
+            preparedStatement.setTimestamp(5, Timestamp.valueOf(programSlotStarts.toLocalDateTime()));
+            preparedStatement.setTimestamp(6, Timestamp.valueOf(programSlotEnds.toLocalDateTime()));
             if (origin != null) {
-                preparedStatement.setTimestamp(7, Timestamp.valueOf(origin));
+                preparedStatement.setTimestamp(7, Timestamp.valueOf(origin.toLocalDateTime()));
             }
             ResultSet resultSet = databaseQuery(preparedStatement);
             if (resultSet.next()) {
@@ -124,9 +126,9 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setTimestamp(
                     1,
-                    Timestamp.valueOf(input.getDateOfProgram())
+                    Timestamp.valueOf(input.getDateOfProgram().toLocalDateTime())
             );
-            preparedStatement.setTime(2, Time.valueOf(input.getDuration()));
+            preparedStatement.setInt(2, (int) input.getDuration().getSeconds());
             preparedStatement.setString(3, input.getRadioProgram().getName());
             preparedStatement.setString(4, input.getPresenter().getId());
             preparedStatement.setString(5, input.getProducer().getId());
@@ -144,7 +146,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
     }
 
     @Override
-    public void delete(LocalDateTime dateOfProgram) throws NotFoundException, InUseException, SQLException {
+    public void delete(ZonedDateTime dateOfProgram) throws NotFoundException, InUseException, SQLException {
         PreparedStatement preparedStatement = null;
         openConnection();
         try {
@@ -153,7 +155,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setTimestamp(
                     1,
-                    Timestamp.valueOf(dateOfProgram)
+                    Timestamp.valueOf(dateOfProgram.toLocalDateTime())
             );
             int rowcount = databaseUpdate(preparedStatement);
             if (rowcount == 0) {
@@ -172,7 +174,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
     }
 
     @Override
-    public ProgramSlot get(LocalDateTime dateOfProgram) throws SQLException, NotFoundException {
+    public ProgramSlot get(ZonedDateTime dateOfProgram) throws SQLException, NotFoundException {
         ProgramSlot result = createValueObject();
         result.setDateOfProgram(dateOfProgram);
         load(result);
@@ -225,7 +227,7 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
     }
 
     @Override
-    public void update(ProgramSlot input, LocalDateTime origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
+    public void update(ProgramSlot input, ZonedDateTime origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, SQLException {
         PreparedStatement preparedStatement = null;
         openConnection();
         try {
@@ -240,16 +242,16 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setTimestamp(
                     1,
-                    Timestamp.valueOf(input.getDateOfProgram())
+                    Timestamp.valueOf(input.getDateOfProgram().toLocalDateTime())
             );
-            preparedStatement.setTime(2, Time.valueOf(input.getDuration()));
+            preparedStatement.setLong(2, input.getDuration().getSeconds());
             preparedStatement.setString(3, input.getRadioProgram().getName());
             preparedStatement.setString(4, input.getPresenter().getId());
             preparedStatement.setString(5, input.getProducer().getId());
             preparedStatement.setString(6, input.getAssignedBy());
             preparedStatement.setTimestamp(
                     7,
-                    Timestamp.valueOf(origin)
+                    Timestamp.valueOf(origin.toLocalDateTime())
             );
             int rowcount = databaseUpdate(preparedStatement);
             if (rowcount == 0) {
@@ -289,7 +291,29 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
             break;
         }
         
+        if (input.getRadioProgram() != null) {
+            sql += queryOpreation + " (program-name = '"
+                    + input.getRadioProgram().getName() + "')";
+        }
+        if (input.getPresenter() != null) {
+            sql += queryOpreation + " (presenter = '"
+                    + input.getPresenter().getId() + "')";
+        }
+        if (input.getProducer() != null) {
+            sql += queryOpreation + " (producer = '"
+                    + input.getProducer().getId() + "')";
+        }
+        if (sql != "") {
+            sql = " WHERE (" + sql.replaceFirst(queryOpreation, "") + ")";
+        }
+        
         if (input.getDateOfProgram() != null) {
+            if (sql != "") {
+                queryOpreation = " AND";
+            } else {
+                queryOpreation = " WHERE";
+            }
+                
             switch (filter) {
                 case BY_YEAR:
                     sql += queryOpreation + " (dateOfProgram >= '"
@@ -330,26 +354,12 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
         } else {
             switch (filter) {
                 case BY_FUTURE:
-                    sql += queryOpreation + " (DateOfProgram >= '" + LocalDateTime.now()
+                    sql += queryOpreation + " (DateOfProgram >= '" + ZonedDateTime.now()
                             + "')";
                     break;
             }
         }
-        if (input.getRadioProgram() != null) {
-            sql += queryOpreation + " (program-name = '"
-                    + input.getRadioProgram().getName() + "')";
-        }
-        if (input.getPresenter() != null) {
-            sql += queryOpreation + " (presenter = '"
-                    + input.getPresenter().getId() + "')";
-        }
-        if (input.getProducer() != null) {
-            sql += queryOpreation + " (producer = '"
-                    + input.getProducer().getId() + "')";
-        }
-        if (sql != "") {
-            sql = " WHERE" + sql.replaceFirst(queryOpreation, "");
-        }
+        
         return sql;
     }
 
@@ -412,8 +422,8 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
 
             if (result.next()) {
                 programSlot.appointAll(
-                        result.getTimestamp("dateOfProgram").toLocalDateTime(),
-                        result.getTime("duration").toLocalTime(),
+                        result.getTimestamp("dateOfProgram").toLocalDateTime().atZone(ZoneId.of("UTC")),
+                        Duration.ofSeconds(result.getLong("duration")),
                         result.getString("program-name"),
                         result.getString("presenter"),
                         result.getString("producer"),
@@ -459,8 +469,8 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
                 ProgramSlot temp = createValueObject();
                 try {
                     temp.appointAll(
-                            result.getTimestamp("dateOfProgram").toLocalDateTime(),
-                            result.getTime("duration").toLocalTime(),
+                            result.getTimestamp("dateOfProgram").toLocalDateTime().atZone(ZoneId.of("UTC")),
+                            Duration.ofSeconds(result.getLong("duration")),
                             result.getString("program-name"),
                             result.getString("presenter"),
                             result.getString("producer"),

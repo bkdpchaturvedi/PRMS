@@ -8,8 +8,8 @@ package sg.edu.nus.iss.phoenix.schedule.entity;
 import java.io.Serializable;
 import sg.edu.nus.iss.phoenix.user.entity.User;
 import sg.edu.nus.iss.phoenix.radioprogram.entity.RadioProgram;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.Duration;
 
 /**
  * AnnualSchedule Value Object. This class is value object representing database
@@ -24,8 +24,8 @@ public class ProgramSlot implements Serializable, Cloneable {
      * Persistent Instance variables. This data is directly mapped to the
      * columns of database table.
      */
-    private LocalDateTime dateOfProgram;
-    private LocalTime duration;
+    private ZonedDateTime dateOfProgram;
+    private Duration duration;
     private RadioProgram radioProgram;
     private User presenter;
     private User producer;
@@ -39,16 +39,16 @@ public class ProgramSlot implements Serializable, Cloneable {
     public ProgramSlot() {
     }
     
-    public ProgramSlot(LocalDateTime dateOfProgram) {
+    public ProgramSlot(ZonedDateTime dateOfProgram) {
         this.dateOfProgram = dateOfProgram;
     }
 
-    public ProgramSlot(LocalDateTime dateOfProgram, LocalTime duration, String radioProgram, String presenter, String producer, String assignedBy) {
+    public ProgramSlot(ZonedDateTime dateOfProgram, Duration duration, RadioProgram radioProgram, User presenter, User producer, String assignedBy) {
         this.dateOfProgram = dateOfProgram;
         this.duration = duration;
-        this.radioProgram = new RadioProgram(radioProgram);
-        this.presenter = new User(presenter);
-        this.producer = new User(producer);
+        this.radioProgram = radioProgram;
+        this.presenter = presenter;
+        this.producer = producer;
         this.assignedBy = assignedBy;
     }
 
@@ -59,19 +59,19 @@ public class ProgramSlot implements Serializable, Cloneable {
      *
      * @return
      */
-    public LocalDateTime getDateOfProgram() {
+    public ZonedDateTime getDateOfProgram() {
         return dateOfProgram;
     }
 
-    public void setDateOfProgram(LocalDateTime dateOfProgram) {
+    public void setDateOfProgram(ZonedDateTime dateOfProgram) {
         this.dateOfProgram = dateOfProgram;
     }
 
-    public LocalTime getDuration() {
+    public Duration getDuration() {
         return duration;
     }
 
-    public void setDuration(LocalTime duration) {
+    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
@@ -120,8 +120,8 @@ public class ProgramSlot implements Serializable, Cloneable {
      * @param producer
      * @param assignedBy
      */
-    public void appointAll(LocalDateTime dateOfProgram,
-            LocalTime duration,
+    public void appointAll(ZonedDateTime dateOfProgram,
+            Duration duration,
             String radioProgram,
             String presenter,
             String producer,
