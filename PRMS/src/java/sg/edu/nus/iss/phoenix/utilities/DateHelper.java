@@ -65,8 +65,12 @@ public class DateHelper {
     }
     
     public static ZonedDateTime getUTC(String input, ChronoUnit truncate)  {
-        return ZonedDateTime.parse(input, DateTimeFormatter.ISO_DATE_TIME)
-                .truncatedTo(truncate)
-                .withZoneSameInstant(ZoneOffset.UTC);
+        if (truncate != null) {
+            return ZonedDateTime.parse(input,DateTimeFormatter.ISO_DATE_TIME)
+                    .truncatedTo(truncate)
+                    .withZoneSameInstant(ZoneOffset.UTC);    
+        }
+        return ZonedDateTime.parse(input,DateTimeFormatter.ISO_DATE_TIME)
+                    .withZoneSameInstant(ZoneOffset.UTC);
     }
 }

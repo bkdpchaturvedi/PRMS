@@ -91,6 +91,7 @@ public class ScheduleService {
                             , ProgramSlotDAO.DateRangeFilter.BY_DATE
                             , ProgramSlotDAO.FieldsOpreation.AND);
             for (ProgramSlot programSlot : result) {
+                DAOFactory.getProgramDAO().load(programSlot.getRadioProgram());
                 DAOFactory.getUserDAO().load(programSlot.getPresenter());
                 DAOFactory.getUserDAO().load(programSlot.getProducer());
             }
@@ -134,6 +135,7 @@ public class ScheduleService {
     public ProgramSlot getProgramSlot(ZonedDateTime dateOfProgram) throws NotFoundException {
         try {
             ProgramSlot result = DAOFactory.getProgramSlotDAO().get(dateOfProgram);
+            DAOFactory.getProgramDAO().load(result.getRadioProgram());
             DAOFactory.getUserDAO().load(result.getPresenter());
             DAOFactory.getUserDAO().load(result.getProducer());
             return result;

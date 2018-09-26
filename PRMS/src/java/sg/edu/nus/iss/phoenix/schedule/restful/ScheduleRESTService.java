@@ -137,7 +137,7 @@ public class ScheduleRESTService {
      * @return
      */
     @DELETE
-    @Path("/delete/{dateOfProgram}")
+    @Path("/{dateOfProgram}")
     @Consumes(MediaType.APPLICATION_JSON)
     public JSONEnvelop<Boolean> deleteRadioProgram(
             @PathParam("dateOfProgram") String dateOfProgram
