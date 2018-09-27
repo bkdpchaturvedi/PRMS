@@ -141,7 +141,7 @@ public class UserRESTService {
      *
      * @param input representation for the resource
      */
-    @POST
+    @PUT
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
     public JSONEnvelop<Boolean> creaeUser(User input) {
@@ -180,7 +180,7 @@ public class UserRESTService {
      * @param id unique identifier for user
      */
     @DELETE
-    @Path("/deletebyid/{id}")
+    @Path("/delete/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public JSONEnvelop<Boolean> deleteUser(
             @PathParam("id") String id
