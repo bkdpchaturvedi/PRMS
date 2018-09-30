@@ -5,6 +5,8 @@
  */
 package sg.edu.nus.iss.phoenix.schedule.restful;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.logging.Logger;
@@ -101,6 +103,7 @@ public class ScheduleRESTService {
     public JSONEnvelop<Boolean> creaeProgramSlot(ProgramSlot input) {
         JSONEnvelop<Boolean> result = new JSONEnvelop<>();
         try {
+            input.setDateOfProgram(DateHelper.getUTC(input.getDateOfProgram().toString()));
             service.createProgramSlot(input);
             result.setData(true);
         } catch (Exception e) {
@@ -121,6 +124,7 @@ public class ScheduleRESTService {
     public JSONEnvelop<Boolean> updateRadioProgram(@PathParam("dateOfProgram") String dateOfProgram, ProgramSlot input) {
         JSONEnvelop<Boolean> result = new JSONEnvelop<>();
         try {
+            input.setDateOfProgram(DateHelper.getUTC(input.getDateOfProgram().toString()));
             service.updateProgramSlot(input, DateHelper.getUTC(dateOfProgram));
             result.setData(true);
         } catch (Exception e) {
