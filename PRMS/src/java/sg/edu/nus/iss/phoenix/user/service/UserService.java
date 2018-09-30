@@ -14,7 +14,10 @@ import java.util.logging.*;
 import sg.edu.nus.iss.phoenix.user.entity.Role;
 import sg.edu.nus.iss.phoenix.user.entity.User;
 import sg.edu.nus.iss.phoenix.core.dao.DAOFactory;
+import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
 import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
+import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
+import sg.edu.nus.iss.phoenix.core.exceptions.ServiceException;
 import sg.edu.nus.iss.phoenix.schedule.dao.ProgramSlotDAO;
 import sg.edu.nus.iss.phoenix.schedule.entity.ProgramSlot;
 
@@ -54,17 +57,18 @@ public class UserService {
      * @return true if creation is successful
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
      */
-    public Boolean createUser(User input) throws InvalidDataException{
+    public Boolean createUser(User input) throws InvalidDataException, SQLException,DuplicateException{
         //throw new UnsupportedOperationException();
         try {
             DAOFactory.getUserDAO().create(input);
             return true;
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
             e.printStackTrace();
+            throw new ServiceException(e.getMessage(), e);
         }
-        return false;
+        //return false;
     }
     
 
@@ -75,7 +79,7 @@ public class UserService {
      * @return true if update user is successful
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
      */
-    public Boolean updateUser(User input) throws InvalidDataException{
+    public Boolean updateUser(User input) throws NotFoundException, InvalidDataException,SQLException,DuplicateException{
         //throw new UnsupportedOperationException();
 
         try {
@@ -104,10 +108,11 @@ public class UserService {
      
            
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
             e.printStackTrace();
-            throw new InvalidDataException(e.getMessage());
+            //throw new InvalidDataException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
         }
         
     }
@@ -121,7 +126,7 @@ public class UserService {
      * @return true if delete user is successful
      * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
      */
-    public Boolean deleteUser(String id) throws InvalidDataException{
+    public Boolean deleteUser(String id) throws NotFoundException, SQLException, InvalidDataException{
         //throw new UnsupportedOperationException();
         try {
             User delUser = new User(id);
@@ -144,10 +149,11 @@ public class UserService {
             DAOFactory.getUserDAO().delete(delUser);
             return true;
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
             e.printStackTrace();
-            throw new InvalidDataException(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
+           // throw new InvalidDataException(e.getMessage());
         }
         
     }
@@ -189,6 +195,7 @@ public class UserService {
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new ServiceException(e.getMessage(), e);
         }
         return producerList;
 

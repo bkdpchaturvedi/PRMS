@@ -15,7 +15,10 @@ import sg.edu.nus.iss.phoenix.user.dao.UserDao;
 import sg.edu.nus.iss.phoenix.user.entity.Role;
 import sg.edu.nus.iss.phoenix.user.entity.User;
 import sg.edu.nus.iss.phoenix.core.dao.DBConstants;
+import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
+import sg.edu.nus.iss.phoenix.utilities.ExceptionHelper;
 
 /**
  * User Data Access Object (DAO). This class contains all database handling that
@@ -108,10 +111,12 @@ public class UserDaoImpl implements UserDao {
 	 *            This parameter contains the class instance to be created. If
 	 *            automatic surrogate-keys are not used the Primary-key field
 	 *            must be set for this to work properly.
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException
 	 * @throws SQLException
+     * @throws sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException
 	 */
 	@Override
-	public synchronized void create(User valueObject) throws SQLException {
+	public synchronized void create(User valueObject) throws DuplicateException, SQLException, InvalidDataException {
 
 		String sql = "";
 		PreparedStatement stmt = null;
@@ -138,7 +143,11 @@ public class UserDaoImpl implements UserDao {
 				throw new SQLException("PrimaryKey Error when updating DB!");
 			}
 
-		} finally {
+		} 
+                catch (SQLException e) {
+                   ExceptionHelper.throwCreationException(e, logger,"User Creation");
+                 }
+                finally {
 			if (stmt != null)
 				stmt.close();
 		}
@@ -154,7 +163,7 @@ public class UserDaoImpl implements UserDao {
 	 * @throws SQLException
 	 */
 	@Override
-	public void save(User valueObject) throws NotFoundException, SQLException {
+	public void save(User valueObject) throws NotFoundException, SQLException, InvalidDataException,DuplicateException {
 
 		String sql = "UPDATE user SET password = ?, name = ?, role = ? WHERE (id = ? ) ";
 		PreparedStatement stmt = null;
@@ -186,7 +195,11 @@ public class UserDaoImpl implements UserDao {
 				throw new SQLException(
 						"PrimaryKey Error when updating DB! (Many objects were affected!)");
 			}
-		} finally {
+		} 
+                catch (SQLException e) {
+                   ExceptionHelper.throwCreationException(e, logger,"User update");
+                 }
+                finally {
 			if (stmt != null)
 				stmt.close();
 		}

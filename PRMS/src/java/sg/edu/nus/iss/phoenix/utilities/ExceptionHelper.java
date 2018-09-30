@@ -70,5 +70,9 @@ public class ExceptionHelper {
                 throw e;
         }
     }
+
+    public static void throwCreationException(SQLException e, Logger logger, String string, String _User_Creation) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

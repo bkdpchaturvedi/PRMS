@@ -6,6 +6,8 @@
 package sg.edu.nus.iss.phoenix.user.dao;
 
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -66,25 +68,33 @@ public class UserDAOTest {
 
     @Test
     public void test01_createUser_withNotExistedKeys_shouldCreate() throws DuplicateException, InvalidDataException, SQLException {
-        thrown.expect(InvalidDataException.class);
-        toCreate.appointAll("testuser1", "Password", "testuser1", "presenter");
-        userDAO.create(toCreate);
+      //thrown.expect(InvalidDataException.class);
+        toCreate.appointAll("testuser"+ ZonedDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss")), "Password", "testuser1", "presenter");
+      
+         userDAO.create(toCreate);
+       
     }
 
     @Test
-    public void test02_createUser_withNullKeys_shouldThrowInvalidData() throws DuplicateException, InvalidDataException, SQLException {
+    public void test02_createUser_withNullKeys_shouldThrowInvalidDataException() throws DuplicateException, InvalidDataException, SQLException {
         thrown.expect(InvalidDataException.class);
-        userDAO.create(toCreate);
+       
+           // toCreate.setId("testcreate"+ ZonedDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss")));
+            userDAO.create(toCreate);
+       
     }
 
     @Test
     public void test03_updateUser_withNewRole_shouldUpdate() {
+
         try {
             ArrayList<Role> roles = new ArrayList<Role>(){};
-            roles.add(new Role("presenter"));
+            roles.add(new Role("producer"));
             toUpdate.setRoles(roles);
-            userDAO.create(toUpdate);
-        } catch (Exception ex) {
+            userDAO.save(toUpdate);
+        } 
+
+        catch (Exception ex) {
             fail(ex.getMessage());
         }
     }
@@ -93,7 +103,7 @@ public class UserDAOTest {
     public void test04_updateUser_withNewName_shouldUpdate() {
         try {
             toUpdate.setName("test04");
-            userDAO.create(toUpdate);
+            userDAO.save(toUpdate);
         } catch (Exception ex) {
             fail(ex.getMessage());
         }
@@ -101,8 +111,15 @@ public class UserDAOTest {
 
     @Test
     public void test05_updateUser_withNewPassword_shouldUpdate() throws SQLException, NotFoundException {
-        thrown.expect(NotFoundException.class);
+        
+        //thrown.expect(NotFoundException.class);
+         try {
         toUpdate.setPassword("password2");
-        userDAO.save(toUpdate);
+         userDAO.save(toUpdate);
+         }
+         catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+       
     }
 }

@@ -2,6 +2,8 @@ package sg.edu.nus.iss.phoenix.user.dao;
 
 import java.sql.SQLException;
 import java.util.List;
+import sg.edu.nus.iss.phoenix.core.exceptions.DuplicateException;
+import sg.edu.nus.iss.phoenix.core.exceptions.InvalidDataException;
 
 import sg.edu.nus.iss.phoenix.user.entity.User;
 import sg.edu.nus.iss.phoenix.user.entity.Role;
@@ -78,7 +80,7 @@ public interface UserDao {
      * @throws java.sql.SQLException
 	 */
 	public abstract void create(User valueObject)
-			throws SQLException;
+			throws DuplicateException, SQLException, InvalidDataException;
 
 	/**
 	 * save-method. This method will save the current state of valueObject to
@@ -95,7 +97,7 @@ public interface UserDao {
      * @throws java.sql.SQLException
 	 */
 	public abstract void save(User valueObject)
-			throws NotFoundException, SQLException;
+			throws NotFoundException, SQLException, InvalidDataException,DuplicateException;
 
 	/**
 	 * delete-method. This method will remove the information from database as
