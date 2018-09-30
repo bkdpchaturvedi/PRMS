@@ -57,7 +57,7 @@ public class ScheduleServiceTest {
         toCreate = new ProgramSlot();
         toCreate.appointAll(ZonedDateTime.parse("2000-01-01T00:00:00Z"), Duration.ofMinutes(10), "news", "dilbert", "wally", "pointyhead");
         toUpdate = new ProgramSlot();
-        toCreate.appointAll(ZonedDateTime.parse("2000-01-01T00:05:00Z"), Duration.ofMinutes(15), "news", "dilbert", "dogbert", "catbert");
+        toUpdate.appointAll(ZonedDateTime.parse("2000-01-01T00:05:00Z"), Duration.ofMinutes(15), "news", "dilbert", "dogbert", "catbert");
     }
 
     @After

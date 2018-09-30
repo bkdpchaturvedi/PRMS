@@ -97,7 +97,6 @@ public class ScheduleRESTService {
      * @return
      */
     @POST
-    @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
     public JSONEnvelop<Boolean> creaeProgramSlot(ProgramSlot input) {
         JSONEnvelop<Boolean> result = new JSONEnvelop<>();
@@ -155,7 +154,7 @@ public class ScheduleRESTService {
     /**
      * Retrieves representation of filtered instances of resource
      *
-     * @param dateOfProgram date for the filtering the resource
+     * @param dateOfProgram date for th e filtering the resource
      * @return
      */
     @GET

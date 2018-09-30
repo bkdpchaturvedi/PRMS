@@ -335,12 +335,10 @@ public class ProgramSlotDAOImpl extends DBConnector implements ProgramSlotDAO {
                     break;
                 case BY_DATE:
                     sql += queryOpreation + " (dateOfProgram >= '"
-                            + input.getDateOfProgram()
-                                    .truncatedTo(ChronoUnit.DAYS).toLocalDate()
+                            + input.getDateOfProgram().toLocalDateTime()
                             + "' AND dateOfProgram < '"
-                            + input.getDateOfProgram()
-                                    .truncatedTo(ChronoUnit.DAYS)
-                                    .plusDays(1).toLocalDate() + "')";
+                            + input.getDateOfProgram().toLocalDateTime()
+                                    .plusDays(1) + "')";
                     break;
                 case BY_HOUR:
                     sql += queryOpreation + " (dateOfProgram >= '"

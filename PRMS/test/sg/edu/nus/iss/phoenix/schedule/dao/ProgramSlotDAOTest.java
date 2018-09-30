@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -61,7 +62,7 @@ public class ProgramSlotDAOTest {
         toCreate = new ProgramSlot();
         toCreate.appointAll(ZonedDateTime.parse("2000-01-01T00:00:00Z"), Duration.ofMinutes(10), "news", "dilbert", "wally", "pointyhead");
         toUpdate = new ProgramSlot();
-        toCreate.appointAll(ZonedDateTime.parse("2000-01-01T00:05:00Z"), Duration.ofMinutes(15), "news", "dilbert", "dogbert", "catbert");
+        toUpdate.appointAll(ZonedDateTime.parse("2000-01-01T00:05:00Z"), Duration.ofMinutes(15), "news", "dilbert", "dogbert", "catbert");
     }
 
     @After
@@ -143,7 +144,7 @@ public class ProgramSlotDAOTest {
     @Test
     public void test08_search_withEsixtedDate_shouldFoundOne() {
         try {
-            List<ProgramSlot> result = programSlotDAO.search(new ProgramSlot(toCreate.getDateOfProgram()), ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
+            List<ProgramSlot> result = programSlotDAO.search(new ProgramSlot(toCreate.getDateOfProgram().truncatedTo(ChronoUnit.DAYS)), ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
             assertEquals(1, result.size());
             assertEquals(toCreate.getRadioProgram().getName(), result.get(0).getRadioProgram().getName());
             assertEquals(toCreate.getPresenter().getId(), result.get(0).getPresenter().getId());
@@ -157,7 +158,7 @@ public class ProgramSlotDAOTest {
     @Test
     public void test09_search_withNonEsixtedDate_shouldFoundNone() {
         try {;
-            List<ProgramSlot> result = programSlotDAO.search(new ProgramSlot(ZonedDateTime.parse("1999-12-31T23:55:00Z")), ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
+            List<ProgramSlot> result = programSlotDAO.search(new ProgramSlot(ZonedDateTime.parse("1999-12-31T00:55:00Z").truncatedTo(ChronoUnit.DAYS)), ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
             assertEquals(0, result.size());
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -167,7 +168,7 @@ public class ProgramSlotDAOTest {
     @Test
     public void test10_checkExisitCount_withDateRagePresenterProducerOpreatorOR_shouldFoundOne() {
         try {
-            ProgramSlot searchProgramSlot = new ProgramSlot(toCreate.getDateOfProgram());
+            ProgramSlot searchProgramSlot = new ProgramSlot(toCreate.getDateOfProgram().truncatedTo(ChronoUnit.DAYS));
             searchProgramSlot.setPresenter(toCreate.getPresenter());
             searchProgramSlot.setProducer(toCreate.getPresenter());
             Integer result = programSlotDAO.checkExistCount(searchProgramSlot, ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.OR);
@@ -180,7 +181,7 @@ public class ProgramSlotDAOTest {
     @Test
     public void test11_checkExisitCount_withDateRagePresenterProducerOpreatorAND_shouldFoundNone() {
         try {
-            ProgramSlot searchProgramSlot = new ProgramSlot(toCreate.getDateOfProgram());
+            ProgramSlot searchProgramSlot = new ProgramSlot(toCreate.getDateOfProgram().truncatedTo(ChronoUnit.DAYS));
             searchProgramSlot.setPresenter(toCreate.getPresenter());
             searchProgramSlot.setProducer(toCreate.getPresenter());
             Integer result = programSlotDAO.checkExistCount(searchProgramSlot, ProgramSlotDAO.DateRangeFilter.BY_DATE, ProgramSlotDAO.FieldsOpreation.AND);
