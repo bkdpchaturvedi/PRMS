@@ -57,7 +57,7 @@ public class UserServiceTest {
     public void setUp() {
         toCreate = new User();
         toUpdate = new User();
-        toUpdate.appointAll("test02", "password", "test02", "presenter");
+        toUpdate.appointAll("unitTestServiceUser01", "password", "test02", "presenter");
     }
 
     @After
@@ -69,7 +69,7 @@ public class UserServiceTest {
     @Test
     public void test01_createUser_withNotExistedKeys_shouldCreate() throws OverlapException,SQLException, DuplicateException, InvalidDataException {
        // thrown.expect(InvalidDataException.class);
-        toCreate.appointAll("testuser"+ ZonedDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss")), "password", "test01", "presenter");
+        toCreate.appointAll("unitTestServiceUser01", "password", "test02", "presenter");
         service.createUser(toCreate);
     }
 
@@ -106,6 +106,13 @@ public class UserServiceTest {
         
         toUpdate.setPassword("password2");
         service.updateUser(toUpdate);
+        
+    }
+    @Test
+    public void test06_deleteUser_withexistingKey_shouldDelete() throws NotFoundException, OverlapException,SQLException, DuplicateException, InvalidDataException {
+        
+       
+        service.deleteUser("unitTestServiceUser01");
         
     }
 }

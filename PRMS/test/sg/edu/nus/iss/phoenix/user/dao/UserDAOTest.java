@@ -57,7 +57,7 @@ public class UserDAOTest {
     public void setUp() {
         toCreate = new User();
         toUpdate = new User();
-        toUpdate.appointAll("testuser2", "Password", "testuser2", "presenter");
+        toUpdate.appointAll("untiTestUser2", "Password", "testuser2", "presenter");
     }
 
     @After
@@ -69,7 +69,7 @@ public class UserDAOTest {
     @Test
     public void test01_createUser_withNotExistedKeys_shouldCreate() throws DuplicateException, InvalidDataException, SQLException {
       //thrown.expect(InvalidDataException.class);
-        toCreate.appointAll("testuser"+ ZonedDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss")), "Password", "testuser1", "presenter");
+        toCreate.appointAll("untiTestUser2", "Password", "testuser2", "presenter");
       
          userDAO.create(toCreate);
        
@@ -114,8 +114,20 @@ public class UserDAOTest {
         
         //thrown.expect(NotFoundException.class);
          try {
-        toUpdate.setPassword("password2");
+            toUpdate.setPassword("password2");
          userDAO.save(toUpdate);
+         }
+         catch (Exception ex) {
+            fail(ex.getMessage());
+        }
+       
+    }
+    @Test
+    public void test06_deleteUser_withExistingUser_shouldDelete() throws SQLException, NotFoundException {
+        
+        //thrown.expect(NotFoundException.class);
+         try {
+         userDAO.delete(toUpdate);
          }
          catch (Exception ex) {
             fail(ex.getMessage());
