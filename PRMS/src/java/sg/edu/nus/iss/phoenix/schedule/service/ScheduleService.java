@@ -82,11 +82,11 @@ public class ScheduleService {
      * @return
      */
     public List<ProgramSlot> findProgramSlots(ZonedDateTime dateOfProgram) {
-        ArrayList<ProgramSlot> result = new ArrayList<ProgramSlot>();
+        List<ProgramSlot> result = new ArrayList<ProgramSlot>();
         try {
             ProgramSlot input = DAOFactory.getProgramSlotDAO().createValueObject();
             input.setDateOfProgram(dateOfProgram);
-            result = (ArrayList<ProgramSlot>) DAOFactory.getProgramSlotDAO()
+            result = DAOFactory.getProgramSlotDAO()
                     .search(input
                             , ProgramSlotDAO.DateRangeFilter.BY_DATE
                             , ProgramSlotDAO.FieldsOpreation.AND);
@@ -159,7 +159,6 @@ public class ScheduleService {
      */
     public void updateProgramSlot(ProgramSlot input, ZonedDateTime origin) throws InvalidDataException, DuplicateException, InUseException, NotFoundException, OverlapException {
         try {
-            populateSchedule(input);
             if (DAOFactory.getProgramSlotDAO().checkOverlap(input, origin)) {
                 throw new OverlapException("Other Program Slot object exists on the given date time and duration.");
             }

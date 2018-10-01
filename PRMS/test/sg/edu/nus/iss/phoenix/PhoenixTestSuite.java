@@ -25,7 +25,7 @@ import sg.edu.nus.iss.phoenix.user.service.UserServiceTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({AuthenticateServiceTest.class,AnnualScheduleDAOTest.class,ProgramSlotDAOTest.class,WeeklyScheduleDAOTest.class,ScheduleServiceTest.class,UserDAOTest.class,UserServiceTest.class})
-public class PhoenixSuite {
+public class PhoenixTestSuite {
 
     @BeforeClass
     public static void setUpClass() throws Exception {

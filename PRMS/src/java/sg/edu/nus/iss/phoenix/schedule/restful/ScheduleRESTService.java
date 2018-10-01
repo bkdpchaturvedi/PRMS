@@ -121,7 +121,7 @@ public class ScheduleRESTService {
     @PUT
     @Path("/{dateOfProgram}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public JSONEnvelop<Boolean> updateRadioProgram(@PathParam("dateOfProgram") String dateOfProgram, ProgramSlot input) {
+    public JSONEnvelop<Boolean> updateProgramSlot(@PathParam("dateOfProgram") String dateOfProgram, ProgramSlot input) {
         JSONEnvelop<Boolean> result = new JSONEnvelop<>();
         try {
             input.setDateOfProgram(DateHelper.getUTC(input.getDateOfProgram().toString()));
@@ -142,7 +142,7 @@ public class ScheduleRESTService {
     @DELETE
     @Path("/{dateOfProgram}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public JSONEnvelop<Boolean> deleteRadioProgram(
+    public JSONEnvelop<Boolean> deleteProgramSlot(
             @PathParam("dateOfProgram") String dateOfProgram
     ) {
         JSONEnvelop<Boolean> result = new JSONEnvelop<>();
